@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REBUILD 3X — Welcome</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #050912;
+    --bg-card:   #0b1020;
+    --bg-card2:  #0f1628;
+    --blue-mid:  #1a2540;
+    --blue-line: #2a3f6e;
+    --accent:    #4a7fd4;
+    --accent-dim:#3567b8;
+    --white:     #e8edf8;
+    --white-dim: rgba(232,237,248,0.65);
+    --white-faint:rgba(232,237,248,0.35);
+    --serif: 'Bebas Neue', sans-serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--white);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(74,127,212,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.12s ease;
+  }
+
+  /* Subtle noise */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* Progress bar */
+  #progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 1px;
+    background: var(--accent);
+    width: 0%;
+    z-index: 999;
+    transition: width 0.1s linear;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 22px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    background: linear-gradient(to bottom, rgba(5,9,18,0.95), transparent);
+  }
+  .logo {
+    font-family: var(--serif);
+    font-size: 20px;
+    letter-spacing: 4px;
+    color: var(--white);
+  }
+  .logo span { color: var(--accent); }
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white-faint);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-text {
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--serif);
+    font-size: clamp(160px, 22vw, 320px);
+    color: rgba(74,127,212,0.04);
+    line-height: 1;
+    pointer-events: none;
+    letter-spacing: -5px;
+    user-select: none;
+  }
+  /* Subtle radial glow behind hero text */
+  .hero::after {
+    content: '';
+    position: absolute;
+    left: -10%; top: 20%;
+    width: 60%; height: 60%;
+    background: radial-gradient(ellipse, rgba(74,127,212,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.7s ease 0.2s forwards;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(64px, 10vw, 140px);
+    line-height: 0.92;
+    letter-spacing: 2px;
+    max-width: 900px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--white);
+  }
+  .hero-sub {
+    margin-top: 36px;
+    max-width: 500px;
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--white-dim);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s ease 0.65s forwards;
+  }
+  .hero-cta {
+    margin-top: 48px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s ease 0.85s forwards;
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px; left: 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white-faint);
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--accent);
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .btn:hover {
+    background: var(--accent-dim);
+    transform: translateY(-2px);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(232,237,248,0.15);
+    margin-left: 14px;
+  }
+  .btn-ghost:hover {
+    background: rgba(74,127,212,0.08);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* DIVIDER */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(74,127,212,0.2), transparent);
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 110px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(40px, 6vw, 76px);
+    line-height: 1;
+    letter-spacing: 1px;
+    margin-bottom: 28px;
+  }
+  .section-body {
+    font-size: 17px;
+    line-height: 1.85;
+    color: var(--white-dim);
+    max-width: 660px;
+  }
+
+  /* PROMISE */
+  .promise {
+    background: var(--bg-card);
+    padding: 100px 80px;
+    max-width: 100%;
+    border-left: 2px solid var(--accent);
+  }
+  .promise-inner { max-width: 980px; margin: 0 auto; }
+
+  /* STEPS */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 56px;
+  }
+  .step-card {
+    background: var(--bg-card);
+    padding: 44px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .step-card:hover { background: var(--bg-card2); }
+  .step-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+  .step-card:hover::before { width: 100%; }
+  .step-number {
+    font-family: var(--serif);
+    font-size: 68px;
+    color: rgba(74,127,212,0.1);
+    line-height: 1;
+    margin-bottom: 14px;
+    transition: color 0.3s;
+  }
+  .step-card:hover .step-number { color: rgba(74,127,212,0.2); }
+  .step-title {
+    font-family: var(--serif);
+    font-size: 26px;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .step-body {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--white-dim);
+    margin-bottom: 24px;
+  }
+  .step-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: gap 0.2s;
+  }
+  .step-link:hover { gap: 14px; }
+  .step-note {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--white-faint);
+    font-style: italic;
+  }
+
+  /* VISION SECTION */
+  .vision-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 56px;
+  }
+  .vision-card {
+    background: var(--bg-card);
+    padding: 40px 36px;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .vision-card:hover { background: var(--bg-card2); }
+  .vision-period {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .vision-heading {
+    font-family: var(--serif);
+    font-size: 22px;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    color: var(--white);
+  }
+  .vision-body {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--white-dim);
+  }
+  .vision-bar {
+    height: 1px;
+    background: linear-gradient(to right, var(--accent), transparent);
+    margin-bottom: 28px;
+    width: 40px;
+  }
+
+  /* TIMELINE (no days) */
+  .timeline {
+    margin-top: 56px;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+  .timeline-item {
+    padding-left: 64px;
+    padding-bottom: 52px;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .timeline-item.visible { opacity: 1; transform: translateX(0); }
+  .timeline-dot {
+    position: absolute;
+    left: 12px; top: 6px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    transition: background 0.3s;
+  }
+  .timeline-item:hover .timeline-dot { background: var(--accent); }
+  .timeline-title {
+    font-family: var(--serif);
+    font-size: 26px;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .timeline-body {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--white-dim);
+    max-width: 580px;
+  }
+
+  /* RULES */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    margin-top: 44px;
+  }
+  .rule-item {
+    padding: 32px 36px;
+    background: var(--bg-card);
+  }
+  .rule-icon { font-size: 22px; margin-bottom: 12px; }
+  .rule-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--white-faint);
+    margin-bottom: 8px;
+  }
+  .rule-value { font-size: 15px; color: var(--white); font-weight: 400; }
+
+  /* CLOSING */
+  .closing {
+    text-align: center;
+    padding: 130px 48px;
+    background: var(--bg-card);
+    position: relative;
+    overflow: hidden;
+  }
+  .closing-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(74,127,212,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .closing blockquote {
+    font-size: clamp(17px, 2.2vw, 24px);
+    line-height: 1.75;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--white-dim);
+    max-width: 760px;
+    margin: 0 auto 36px;
+  }
+  .closing cite {
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* FINAL CTA */
+  .final-cta {
+    text-align: center;
+    padding: 100px 48px;
+  }
+  .final-cta .section-title { margin-bottom: 44px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 18px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 0 24px; }
+    section { padding: 72px 24px; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .vision-grid { grid-template-columns: 1fr; }
+    .rules-grid { grid-template-columns: 1fr; }
+    .promise { padding: 56px 24px; }
+    .closing { padding: 72px 24px; }
+    .final-cta { padding: 72px 24px; }
+    .timeline::before { left: 12px; }
+    .timeline-item { padding-left: 44px; }
+    .timeline-dot { left: 4px; }
+    .btn-ghost { margin-left: 0; margin-top: 12px; display: inline-flex; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">REBUILD <span>3X</span></div>
+  <ul class="nav-links">
+    <li><a href="#steps">First Steps</a></li>
+    <li><a href="#process">The Process</a></li>
+    <li><a href="#vision">6 Months</a></li>
+    <li><a href="#rules">How We Work</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-text">3X</div>
+  <p class="hero-tag">You're officially in</p>
+  <h1>Welcome to<br><em>REBUILD</em><br>3X.</h1>
+  <p class="hero-sub">You're in. Read this page carefully. It tells you exactly what happens from here and what you can expect from this investment going forward.</p>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll to begin
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROMISE -->
+<div class="promise reveal">
+  <div class="promise-inner">
+    <p class="section-label">The Promise</p>
+    <h2 class="section-title">Here's What I'm<br>Committing To You.</h2>
+    <p class="section-body">You didn't just invest in a workout plan. You invested in a system built specifically for men who have real lives. Careers, pressure, responsibilities, and very limited time to waste.</p>
+    <br>
+    <p class="section-body">This is built around your actual schedule and your actual life. Every part of it is designed to keep working even during your most demanding weeks.</p>
+    <br>
+    <p class="section-body" style="color: var(--white); font-weight: 400;">You will be guided through every step. Nothing gets left for you to figure out alone. That is what this coaching is.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STEPS -->
+<section id="steps">
+  <p class="section-label reveal">Action Required</p>
+  <h2 class="section-title reveal">Your 3 Steps.<br>Do These Today.</h2>
+  <p class="section-body reveal" style="margin-bottom: 0;">Complete these 3 steps to activate your coaching. Everything starts here.</p>
+
+  <div class="steps-grid">
+
+    <div class="step-card reveal">
+      <div class="step-number">01</div>
+      <div class="step-title">Fill Your Intake Form</div>
+      <p class="step-body">This form is how I understand your full picture before we speak. Your schedule, your goals, your training background, your lifestyle. The more detail you give, the more precise your program will be from day one.</p>
+      <a href="https://tally.so/r/w78ZD6" class="step-link">Fill Form →</a>
+      <p class="step-note">Takes 5 minutes. Complete it today.</p>
+    </div>
+
+    <div class="step-card reveal">
+      <div class="step-number">02</div>
+      <div class="step-title">Book Your Kickoff Call</div>
+      <p class="step-body">This is a 30 minute call where your program gets built. I will have reviewed your intake form before we speak and I'll have specific questions ready about your schedule, your goals, and how your weeks are structured.<br><br>Come ready to talk openly. The more I understand your life, the better I can build around it.</p>
+      <a href="https://cal.eu/kyriakos-parpas/15min" class="step-link">Book Call →</a>
+      <p class="step-note">Book a slot this week.</p>
+    </div>
+
+    <div class="step-card reveal" style="grid-column: 1 / -1;">
+      <div class="step-number">03</div>
+      <div class="step-title">Set Up Trainerize</div>
+      <p class="step-body" style="max-width: 640px;">Check your inbox. You have an email from Trainerize with the subject line <strong style="color: var(--white);">"You've been invited"</strong>. Open it and follow the steps inside. Your workouts, your schedule, and your progress tracking will all be set up and ready for you once you're in.<br><br><em style="color: var(--white-faint); font-size: 13px;">Can't find it? Check your spam folder. Still nothing? Message me on Trainerize and I will resend it.</em></p>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROCESS / WHAT HAPPENS -->
+<section id="process" style="max-width: 1100px;">
+  <p class="section-label reveal">The Process</p>
+  <h2 class="section-title reveal">How This<br>Gets Built.</h2>
+  <p class="section-body reveal">Once your 3 steps are complete, here is exactly how the coaching unfolds.</p>
+
+  <div class="timeline">
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <h3 class="timeline-title">The Intake Form Review</h3>
+      <p class="timeline-body">Before our call I go through everything you submitted. Your schedule, your goals, your lifestyle. This is how I arrive prepared with a clear direction for your program before we even speak.</p>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <h3 class="timeline-title">The Kickoff Call</h3>
+      <p class="timeline-body">A focused 30 minute call where we go deep into your life, your schedule, and what you want to achieve. I ask the questions that matter. By the end of this call we both know exactly what your program needs to look like and why.</p>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <h3 class="timeline-title">Your Program Is Built</h3>
+      <p class="timeline-body">A training and nutrition structure built around your real schedule and your real goals. Not a template. Something designed specifically for how your weeks actually run. It lands in Trainerize so you can start as soon as possible.</p>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <h3 class="timeline-title">Daily Contact. Weekly Adjustments.</h3>
+      <p class="timeline-body">Every single day I check in with you through Trainerize. You are never left to figure things out on your own. Every week your program gets reviewed and adjusted based on your progress. This is active coaching, not a plan handed to you and forgotten.</p>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 6 MONTH VISION -->
+<section id="vision" style="max-width: 1100px;">
+  <p class="section-label reveal">The Reality</p>
+  <h2 class="section-title reveal">What The Next<br>6 Months Look Like.</h2>
+  <p class="section-body reveal">An honest picture of what consistent work inside this system produces over time.</p>
+
+  <div class="vision-grid">
+
+    <div class="vision-card reveal">
+      <div class="vision-bar"></div>
+      <div class="vision-period">Month 1</div>
+      <div class="vision-heading">Building The Base</div>
+      <p class="vision-body">The first month is about locking the system in around your real schedule. You start moving with structure and purpose. Energy begins to shift. Sleep improves. The physical changes are just beginning but you will feel the difference in how you move through your week.</p>
+    </div>
+
+    <div class="vision-card reveal">
+      <div class="vision-bar"></div>
+      <div class="vision-period">Month 2 and 3</div>
+      <div class="vision-heading">Visible Change Begins</div>
+      <p class="vision-body">This is where physical changes become noticeable. Clothes fit differently. Strength increases steadily. The program has been refined to your body and your schedule by this point so everything is running efficiently. The system is holding up under your real weeks, not just the comfortable ones.</p>
+    </div>
+
+    <div class="vision-card reveal">
+      <div class="vision-bar"></div>
+      <div class="vision-period">Month 4 to 6</div>
+      <div class="vision-heading">The Shift</div>
+      <p class="vision-body">The physical change is real and visible. But the deeper shift is in how you operate. You have built a system that holds up under pressure and you know it works. Your relationship with your body and your discipline has changed in a way that carries forward long past these 6 months.</p>
+    </div>
+
+  </div>
+
+  <p class="section-body reveal" style="margin-top: 48px; font-style: italic; color: var(--white-faint);">Every result depends on the work put in. I am with you through all of it.</p>
+</section>
+
+<div class="divider"></div>
+
+<!-- RULES -->
+<section id="rules" style="max-width: 1100px;">
+  <p class="section-label reveal">Ground Rules</p>
+  <h2 class="section-title reveal">How We Work<br>Together.</h2>
+  <p class="section-body reveal">How communication and coaching works from here.</p>
+
+  <div class="rules-grid">
+    <div class="rule-item reveal">
+      <div class="rule-icon">📲</div>
+      <div class="rule-label">Communication</div>
+      <div class="rule-value">All communication happens through Trainerize. That is where your coaching lives.</div>
+    </div>
+    <div class="rule-item reveal">
+      <div class="rule-icon">📅</div>
+      <div class="rule-label">Daily Check-ins</div>
+      <div class="rule-value">I check in with you every single day through Trainerize. You are never on your own with this.</div>
+    </div>
+    <div class="rule-item reveal">
+      <div class="rule-icon">📋</div>
+      <div class="rule-label">Weekly Updates</div>
+      <div class="rule-value">Every week you send me a short progress update using the format I provide. This is how I track where you are and keep the program sharp.</div>
+    </div>
+    <div class="rule-item reveal">
+      <div class="rule-icon">🔄</div>
+      <div class="rule-label">Program Adjustments</div>
+      <div class="rule-value">If anything in your schedule or life changes, let me know through Trainerize. The program adapts around your reality.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CLOSING -->
+<div class="closing reveal">
+  <div class="closing-bg"></div>
+  <p style="font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px;">Your Coach</p>
+  <p style="font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px, 4vw, 48px); letter-spacing: 2px; margin-bottom: 8px;">Kyriakos Parpas</p>
+  <p style="font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--white-faint);">REBUILD 3X</p>
+</div>
+
+<!-- FINAL CTA -->
+<div class="final-cta">
+  <h2 class="section-title reveal">You're In.<br>Now Move.</h2>
+  <div class="reveal">
+    <a href="https://tally.so/r/w78ZD6" class="btn" style="margin: 8px;">Fill Intake Form →</a>
+    <a href="https://cal.eu/kyriakos-parpas/15min" class="btn btn-ghost" style="margin: 8px;">Book Kickoff Call →</a>
+  </div>
+</div>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  (function animCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  })();
+
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement.scrollTop;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('progress').style.width = (s / h * 100) + '%';
+  });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), 80);
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal, .timeline-item').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
