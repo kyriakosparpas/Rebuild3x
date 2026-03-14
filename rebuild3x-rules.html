@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The REBUILD 3X Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg:          #080e1a;
+  --bg-card:     #0e1628;
+  --bg-border:   #1a2640;
+  --blue:        #1a52e0;
+  --blue-mid:    #152e7a;
+  --blue-light:  #4a7fff;
+  --blue-dim:    #2a4a8a;
+  --white:       #ffffff;
+  --white-80:    rgba(255,255,255,0.80);
+  --white-50:    rgba(255,255,255,0.45);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* NAV */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(8,14,26,0.97);
+  border-bottom: 1px solid var(--bg-border);
+  padding: 13px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+}
+.nav-brand {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+.nav-brand span {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: var(--white-50);
+  margin-left: 6px;
+  text-transform: none;
+}
+.nav-pg {
+  font-size: 11px;
+  color: var(--white-50);
+  font-weight: 300;
+}
+
+/* PROGRESS */
+.pbar {
+  display: flex;
+  gap: 3px;
+  padding: 8px 22px;
+  background: rgba(8,14,26,0.97);
+  border-bottom: 1px solid var(--bg-border);
+  position: sticky;
+  top: 47px;
+  z-index: 59;
+}
+.pip {
+  height: 2px;
+  flex: 1;
+  background: var(--bg-border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.pip.on   { background: var(--blue-light); }
+.pip.done { background: var(--blue); opacity: .35; }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; animation: up .25s ease; }
+@keyframes up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════
+   COVER — special page
+══════════════════════ */
+.cover {
+  min-height: calc(100svh - 105px);
+  padding: 44px 24px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  /* midnight blue with radial center glow — matching the screenshot */
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, #0f2a5e 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 20%, #0a1e48 0%, transparent 60%),
+    linear-gradient(180deg, #08101f 0%, #060c18 100%);
+}
+.cover-ghost {
+  position: absolute;
+  bottom: -30px;
+  right: -22px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(140px, 40vw, 190px);
+  font-weight: 800;
+  letter-spacing: -6px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  background: linear-gradient(to left, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.c-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--blue-dim);
+  margin-bottom: 18px;
+  opacity: 0.8;
+}
+.c-framework {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(72px, 20vw, 96px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: var(--white);
+  line-height: 0.88;
+}
+.c-rebuild {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(36px, 10vw, 50px);
+  font-weight: 700;
+  letter-spacing: 0px;
+  text-transform: uppercase;
+  color: var(--blue-dim);
+  line-height: 1.1;
+  margin-bottom: 20px;
+  margin-top: 4px;
+}
+.c-by {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--white-50);
+  letter-spacing: 1px;
+  font-family: 'DM Sans', sans-serif;
+}
+.c-middle {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.c-middle-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--white-80);
+  font-weight: 300;
+  line-height: 1.55;
+  font-family: 'DM Sans', sans-serif;
+}
+.c-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  flex-shrink: 0;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+.c-desc {
+  font-size: 14px;
+  color: var(--white-50);
+  font-weight: 300;
+  line-height: 1.8;
+  font-family: 'DM Sans', sans-serif;
+  font-style: italic;
+}
+
+/* ══════════════════════
+   INNER PAGES
+══════════════════════ */
+.content { padding: 36px 24px 32px; }
+
+.eyebrow {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue-light);
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+.pg-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(32px, 9vw, 46px);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+.pg-title em { font-style: italic; color: var(--white-50); }
+
+.pg-intro {
+  font-size: 15px;
+  color: var(--white-80);
+  font-weight: 300;
+  line-height: 1.8;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--bg-border);
+}
+
+/* BLOCK */
+.blk {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--bg-border);
+}
+.blk:last-child { border-bottom: none; }
+.blk-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white-50);
+  margin-bottom: 7px;
+  font-weight: 400;
+}
+.blk-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.3;
+  margin-bottom: 9px;
+}
+.blk-body {
+  font-size: 14px;
+  color: var(--white-80);
+  font-weight: 300;
+  line-height: 1.85;
+}
+.blk-body strong { color: var(--white); font-weight: 500; }
+
+/* STEPS */
+.steps { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--blue-mid);
+  border: 1px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; color: var(--white);
+  flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 13px; color: var(--white-80); font-weight: 300; line-height: 1.7; }
+.step-text strong { color: var(--white); font-weight: 500; }
+
+/* CALLOUT */
+.callout {
+  background: var(--blue-mid);
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin: 22px 0;
+}
+.callout-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+.callout-body {
+  font-family: 'Instrument Serif', serif;
+  font-size: 21px;
+  line-height: 1.38;
+  color: var(--white);
+}
+.callout-body em { font-style: italic; color: var(--blue-light); }
+
+/* NOTE */
+.note {
+  background: var(--bg-card);
+  border-left: 2px solid var(--blue);
+  border-radius: 0 6px 6px 0;
+  padding: 14px 16px; margin: 20px 0;
+  font-size: 14px; color: var(--white-80); font-weight: 300; line-height: 1.8;
+}
+.note strong { color: var(--white); font-weight: 500; }
+
+/* PLATE */
+.plate-card {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-border);
+  border-radius: 10px;
+  padding: 22px 18px; margin: 20px 0;
+}
+.plate-card-label {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--white-50); text-align: center; margin-bottom: 18px; font-weight: 400;
+}
+.plate-center { display: flex; justify-content: center; margin-bottom: 20px; }
+.plate-key { display: flex; flex-direction: column; gap: 10px; }
+.pk-row { display: flex; gap: 10px; align-items: flex-start; }
+.pk-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.pk-title { font-size: 14px; font-weight: 500; margin-bottom: 1px; }
+.pk-eg { font-size: 12px; color: var(--white-50); font-weight: 300; line-height: 1.5; }
+
+/* MEALS */
+.meal { padding: 20px 0; border-bottom: 1px solid var(--bg-border); }
+.meal:last-of-type { border-bottom: none; }
+.meal-num {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--white-50); margin-bottom: 5px; font-weight: 400;
+}
+.meal-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px; margin-bottom: 7px; line-height: 1.2;
+}
+.meal-body { font-size: 14px; color: var(--white-80); font-weight: 300; line-height: 1.85; }
+.meal-body strong { color: var(--white); font-weight: 500; }
+.meal-eg { margin-top: 8px; font-size: 12px; color: var(--white-50); font-weight: 300; line-height: 1.6; font-style: italic; }
+
+/* FINAL */
+.final {
+  min-height: calc(100svh - 105px);
+  padding: 44px 24px 40px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.final-label {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--white-50); margin-bottom: 14px; font-weight: 400;
+}
+.final-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(34px, 10vw, 48px);
+  font-weight: 400; line-height: 1.05;
+}
+.final-title em { font-style: italic; color: var(--white-50); }
+.sum-list { list-style: none; margin-top: 24px; border-top: 1px solid var(--bg-border); }
+.sum-item {
+  display: flex; gap: 14px; padding: 14px 0;
+  border-bottom: 1px solid var(--bg-border); align-items: flex-start;
+}
+.sum-n {
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px; color: var(--bg-border);
+  line-height: 1; flex-shrink: 0; width: 20px;
+}
+.sum-text { font-size: 14px; color: var(--white-80); font-weight: 300; line-height: 1.7; }
+.sum-text strong { color: var(--white); font-weight: 500; }
+.final-foot { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--bg-border); }
+.ff-name {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--white-50); margin-bottom: 3px; font-weight: 400;
+}
+
+/* BOTTOM NAV */
+.bot {
+  position: sticky; bottom: 0; z-index: 60;
+  background: rgba(8,14,26,0.97);
+  border-top: 1px solid var(--bg-border);
+  display: flex; gap: 10px; padding: 11px 22px 18px;
+  backdrop-filter: blur(10px);
+}
+.btn {
+  flex: 1; padding: 13px; border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; border: none; transition: transform .1s;
+}
+.btn:active { transform: scale(.97); }
+.btn-solid { background: var(--blue); color: var(--white); }
+.btn-soft  { background: var(--bg-card); color: var(--white-80); border: 1px solid var(--bg-border); }
+.btn-off   { background: transparent; color: var(--bg-border); border: 1px solid var(--bg-border); cursor: default; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <span class="nav-brand">Rebuild 3X<span>by Kyriakos Parpas</span></span>
+  <span class="nav-pg" id="cnt">1 of 9</span>
+</div>
+<div class="pbar" id="pips"></div>
+
+
+<!-- PAGE 0 — COVER -->
+<div class="page active" id="page-0">
+  <div class="cover">
+    <div class="cover-ghost">3X</div>
+    <div>
+      <div class="c-eyebrow">Rebuild 3X Coaching</div>
+      <div class="c-framework">Framework</div>
+      <div class="c-rebuild">Rebuild 3X</div>
+      <div class="c-by">by Kyriakos Parpas</div>
+    </div>
+    <div class="c-middle">
+      <div class="c-middle-item"><span class="c-dot"></span>What you need to follow every week to see results</div>
+      <div class="c-middle-item"><span class="c-dot"></span>How to eat, train, and recover the right way</div>
+      <div class="c-middle-item"><span class="c-dot"></span>How I track your progress and keep you on course</div>
+    </div>
+    <div>
+      <div class="c-desc">Progress does not come from perfect weeks. It comes from showing up on the hard ones.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 1 — FOUNDATION 01 -->
+<div class="page" id="page-1">
+  <div class="content">
+    <span class="eyebrow">Foundation 01</span>
+    <div class="pg-title">The system<br>survives <em>your week.</em></div>
+    <div class="pg-intro">Most programs fail busy men not because they are weak, but because the system was never built for their life. This one was built for yours.</div>
+    <div class="blk">
+      <div class="blk-label">The one thing to remember</div>
+      <div class="blk-title">Never miss twice.</div>
+      <div class="blk-body">Miss a session, come back the next day. Ate badly, start fresh in the morning. <strong>One slip is human. Two slips becomes a pattern.</strong> You do not restart. You continue. That is the whole difference.</div>
+    </div>
+    <div class="callout">
+      <div class="callout-label">Why three days works</div>
+      <div class="callout-body">Three sessions done for twelve months <em>always beats</em> six sessions done for six weeks.</div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">My role</div>
+      <div class="blk-title">I am with you every single day.</div>
+      <div class="blk-body">I check in, I watch the data, I adjust your plan. <strong>But I can only do that if you show up and keep me informed.</strong> Everything you log, every update you send, makes your results more precise. DM me any time something feels off.</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">When a session is missed, message me the same day so I know and can adjust the week.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">When a week feels hard, tell me before it becomes two hard weeks.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Never go quiet.</strong> The results come from the communication between us, not just the training.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 2 — FOUNDATION 02 -->
+<div class="page" id="page-2">
+  <div class="content">
+    <span class="eyebrow">Foundation 02</span>
+    <div class="pg-title">One number.<br><em>Protein.</em></div>
+    <div class="pg-intro">You are not tracking calories. You are not weighing food. You have one daily target. I set that number based on your weight and your goal. Hit it every day.</div>
+    <div class="blk">
+      <div class="blk-label">Why this number drives everything</div>
+      <div class="blk-title">Protein keeps you full, protects your muscle, and drives fat loss.</div>
+      <div class="blk-body">When you consistently hit your protein target, overeating becomes difficult. Your body holds muscle while burning fat. <strong>Everything else in your nutrition falls into place around that one number.</strong></div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Open Trainerize after every meal and log what you ate. Takes 60 seconds.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Check your protein total at midday. If you are behind, your evening meal closes the gap.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>If you are consistently missing the target, DM me.</strong> I will adjust the number or the structure so it becomes achievable for your schedule.</div></div>
+      </div>
+    </div>
+    <div class="note"><strong>Log your meals in Trainerize every day.</strong> I look at those logs. That is how I know what to adjust and when. Without them I am working blind.</div>
+    <div class="blk">
+      <div class="blk-label">Between meals</div>
+      <div class="blk-title">Fruit works. Keep it simple.</div>
+      <div class="blk-body">If you are hungry between meals, fruit is a clean option. It keeps you away from food that works against your deficit. <strong>Keep it light and log it.</strong></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 3 — FOUNDATION 03 -->
+<div class="page" id="page-3">
+  <div class="content">
+    <span class="eyebrow">Foundation 03</span>
+    <div class="pg-title">Build every<br>plate the<br><em>same way.</em></div>
+    <div class="pg-intro">No weighing. No counting at the table. Look at your plate and know in two seconds if it is built right. This is what right looks like.</div>
+    <div class="plate-card">
+      <div class="plate-card-label">Every meal</div>
+      <div class="plate-center">
+        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="103" r="88" fill="rgba(0,0,0,0.25)"/>
+          <circle cx="100" cy="100" r="88" fill="#0e1628" stroke="#1a2640" stroke-width="1.5"/>
+          <path d="M100,12 A88,88 0 0,1 100,188 L100,100 Z" fill="#1a52e0" opacity="0.9"/>
+          <path d="M100,100 L12,100 A88,88 0 0,1 100,12 Z" fill="#2a4faa" opacity="0.85"/>
+          <path d="M100,100 L100,188 A88,88 0 0,1 12,100 Z" fill="#3d6090" opacity="0.75"/>
+          <line x1="100" y1="12" x2="100" y2="188" stroke="#080e1a" stroke-width="2.5"/>
+          <line x1="12" y1="100" x2="100" y2="100" stroke="#080e1a" stroke-width="2.5"/>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="#1a2640" stroke-width="1.5"/>
+          <text x="145" y="96" font-family="DM Sans,sans-serif" font-size="12" font-weight="600" fill="white" text-anchor="middle">Protein</text>
+          <text x="145" y="112" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(255,255,255,0.55)" text-anchor="middle">50%</text>
+          <text x="56" y="68" font-family="DM Sans,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Carbs</text>
+          <text x="56" y="82" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,255,255,0.5)" text-anchor="middle">25%</text>
+          <text x="56" y="136" font-family="DM Sans,sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle">Veg</text>
+          <text x="56" y="150" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,255,255,0.5)" text-anchor="middle">25%</text>
+        </svg>
+      </div>
+      <div class="plate-key">
+        <div class="pk-row"><div class="pk-dot" style="background:#1a52e0;"></div><div><div class="pk-title">Protein — half the plate</div><div class="pk-eg">Chicken, beef, fish, eggs, Greek yogurt, cottage cheese</div></div></div>
+        <div class="pk-row"><div class="pk-dot" style="background:#2a4faa;"></div><div><div class="pk-title">Carbohydrate — one quarter</div><div class="pk-eg">Rice, potatoes, oats, bread, pasta</div></div></div>
+        <div class="pk-row"><div class="pk-dot" style="background:#3d6090;"></div><div><div class="pk-title">Vegetables — one quarter</div><div class="pk-eg">Anything green or colourful</div></div></div>
+        <div class="pk-row"><div class="pk-dot" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);"></div><div><div class="pk-title">Fats — add where needed</div><div class="pk-eg">Olive oil, avocado, nuts. Use them, do not build the meal around them</div></div></div>
+      </div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">How to protect your deficit at every meal</div>
+      <div class="blk-title">Protein fills the plate first. Everything else fits around it.</div>
+      <div class="blk-body">The most common reason progress stalls is people underestimate what they eat. Build the protein portion first, then fill the rest.</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Put your protein source on the plate before anything else.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Fill one quarter with a carb source and one quarter with vegetables.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>If the plate does not look right, DM me a photo.</strong> I will tell you exactly what to adjust.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 4 — FOUNDATION 04 -->
+<div class="page" id="page-4">
+  <div class="content">
+    <span class="eyebrow">Foundation 04</span>
+    <div class="pg-title">Three meals.<br><em>No more.</em></div>
+    <div class="pg-intro">Three meals a day, each built using the plate rule and centred around your protein target. This structure keeps your deficit in check without obsessing over food. Log every meal in Trainerize.</div>
+    <div class="meal">
+      <div class="meal-num">Meal one — morning</div>
+      <div class="meal-title">Start with protein.</div>
+      <div class="meal-body">When you start the morning with a solid protein meal, you are far less likely to overeat later. <strong>Do not skip this meal thinking it saves calories. It does the opposite.</strong> A skipped breakfast almost always leads to overeating at dinner.</div>
+      <div class="meal-eg">Eggs with toast. Greek yogurt with fruit. Oats with a protein source. Aim for 30 to 40 grams of protein.</div>
+    </div>
+    <div class="meal">
+      <div class="meal-num">Meal two — midday</div>
+      <div class="meal-title">Your biggest meal of the day.</div>
+      <div class="meal-body">Full plate rule applied. This is where most of your daily protein gets hit. <strong>Do not make this meal small.</strong> Eating too little here means you will eat too much at dinner and undo the deficit you worked for all day.</div>
+      <div class="meal-eg">Chicken with rice and salad. Ground beef with potatoes and vegetables. Tuna with pasta.</div>
+    </div>
+    <div class="meal">
+      <div class="meal-num">Meal three — evening</div>
+      <div class="meal-title">Close your protein target.</div>
+      <div class="meal-body">Check where you are on protein before you cook. This meal fills what is left. <strong>Eat to close the target, not to feel stuffed.</strong> The evening is where most people overshoot and quietly kill the deficit. Keep portions controlled here.</div>
+      <div class="meal-eg">Salmon with vegetables. Eggs with avocado. Ground beef with salad.</div>
+    </div>
+    <div class="note"><strong>Eating out or travelling?</strong> Apply the plate rule visually. Order protein first, fill the rest around it. DM me before if you are unsure and I will tell you exactly what to order.</div>
+  </div>
+</div>
+
+
+<!-- PAGE 5 — FOUNDATION 05 -->
+<div class="page" id="page-5">
+  <div class="content">
+    <span class="eyebrow">Foundation 05</span>
+    <div class="pg-title">Three days.<br><em>Show up.</em></div>
+    <div class="pg-intro">Three sessions per week. Your days are set in Trainerize. I built your program around your schedule. Follow it.</div>
+    <div class="callout">
+      <div class="callout-label">When life gets in the way</div>
+      <div class="callout-body">Twenty minutes <em>still counts.</em> Never let zero happen.</div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">What every session requires</div>
+      <div class="blk-title">Follow the program. Log the weights and reps.</div>
+      <div class="blk-body">Open Trainerize. Do what is written. Log it when you are done. <strong>That data is how I make your program more effective every single week.</strong> Without it I cannot progress you.</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Open Trainerize before the session, not when you arrive at the gym. Know what you are doing before you walk in.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Log every set as you complete it. Weight used, reps done.</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>If a movement feels wrong or causes pain, stop and DM me immediately.</strong> Do not push through something that does not feel right.</div></div>
+      </div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">Rest days</div>
+      <div class="blk-title">Move, do not train.</div>
+      <div class="blk-body">Walk, stretch, hit your steps. Your body rebuilds on rest days. <strong>That is when the work you did in the gym actually becomes muscle.</strong></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 6 — FOUNDATION 06 -->
+<div class="page" id="page-6">
+  <div class="content">
+    <span class="eyebrow">Foundation 06</span>
+    <div class="pg-title">Outside<br>the <em>gym.</em></div>
+    <div class="pg-intro">Three habits that run in the background every day and account for more of your results than most people realise.</div>
+    <div class="blk">
+      <div class="blk-label">Daily movement</div>
+      <div class="blk-title">6,000 to 10,000 steps a day.</div>
+      <div class="blk-body">Not a workout. Your daily baseline. Over months this adds up to more than most gym sessions. <strong>Aim for 6,000 to 10,000 every day.</strong></div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Check your step count at 8pm every evening. If you are under 6,000, go for a 15-minute walk before bed.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Park further away, take stairs, walk on calls. These small decisions compound over months.</div></div>
+      </div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">Sleep</div>
+      <div class="blk-title">Seven to eight hours. Protect it like a training day.</div>
+      <div class="blk-body">Without sleep your hunger spikes, your recovery drops, and your training produces almost nothing. <strong>You cannot out-train bad sleep.</strong> It is a requirement, not a preference.</div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">Water</div>
+      <div class="blk-title">2.5 to 3 litres a day.</div>
+      <div class="blk-body">Dehydration makes you feel tired and hungry when you are not. <strong>Start every morning with a full glass before coffee.</strong> Carry a bottle. Drink consistently through the day.</div>
+    </div>
+    <div class="note"><strong>Every Sunday morning, step on the scale.</strong> Same time, before eating. Log the number in Trainerize. I track the trend week by week and adjust your plan based on what I see.</div>
+  </div>
+</div>
+
+
+<!-- PAGE 7 — PROGRESS -->
+<div class="page" id="page-7">
+  <div class="content">
+    <span class="eyebrow">Progress</span>
+    <div class="pg-title">How we<br>track <em>results.</em></div>
+    <div class="pg-intro">Progress is not something you feel week to week. It is something you measure. I watch the numbers and adjust the plan. Your job is to give me accurate data to work with.</div>
+    <div class="blk">
+      <div class="blk-label">What I track</div>
+      <div class="blk-title">Your weight trend, your logs, your honest updates.</div>
+      <div class="blk-body">Your weekly weight, your meal logs, your training data. <strong>All of that feeds into every decision I make about your program.</strong> The more consistent you are, the more precise I can be with your results.</div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">What the scale actually means</div>
+      <div class="blk-title">The direction over four weeks is what matters.</div>
+      <div class="blk-body">Daily weight fluctuates and that is completely normal. <strong>I look at the trend across weeks, not any single number.</strong> If the trend is not moving the right way, I adjust the plan. That is my job.</div>
+    </div>
+    <div class="callout">
+      <div class="callout-label">Most important</div>
+      <div class="callout-body">A bad week you tell me about is a problem I can fix. <em>A bad week you hide compounds.</em></div>
+    </div>
+    <div class="blk">
+      <div class="blk-label">When progress slows</div>
+      <div class="blk-title">It means something needs adjusting. DM me.</div>
+      <div class="blk-body">Slow progress is never a reason to quit. <strong>It is information I use to make the plan better.</strong> Keep showing up. Keep the data honest. I handle the rest.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 8 — SUMMARY -->
+<div class="page" id="page-8">
+  <div class="final">
+    <div>
+      <div class="final-label">The Rebuild 3X Framework</div>
+      <div class="final-title">Six foundations.<br><em>Everything else</em><br>is noise.</div>
+      <ul class="sum-list">
+        <li class="sum-item"><span class="sum-n">1</span><span class="sum-text"><strong>Never miss twice.</strong> The system survives your week. You continue, you do not restart.</span></li>
+        <li class="sum-item"><span class="sum-n">2</span><span class="sum-text"><strong>Hit your protein target every day.</strong> I set the number. You hit it. Log your meals in Trainerize.</span></li>
+        <li class="sum-item"><span class="sum-n">3</span><span class="sum-text"><strong>Plate rule at every meal.</strong> Half protein, one quarter carbs, one quarter veg. Protein goes on first.</span></li>
+        <li class="sum-item"><span class="sum-n">4</span><span class="sum-text"><strong>Three meals a day.</strong> Eat to close your protein target, not to feel stuffed. Log everything.</span></li>
+        <li class="sum-item"><span class="sum-n">5</span><span class="sum-text"><strong>Three training sessions a week.</strong> Follow the program. Log every session. Twenty minutes beats zero.</span></li>
+        <li class="sum-item"><span class="sum-n">6</span><span class="sum-text"><strong>6,000 to 10,000 steps. 7 to 8 hours sleep. 2.5 litres of water.</strong> Weigh in every Sunday morning and log it.</span></li>
+      </ul>
+    </div>
+    <div class="final-foot">
+      <div class="ff-name">Rebuild 3X — Kyriakos Parpas</div>
+      <div style="margin-top:18px; padding-top:18px; border-top:1px solid var(--bg-border); font-size:13px; color:var(--white-50); font-weight:300; line-height:1.8;">
+        Take a screenshot of these six and save it somewhere you will see it every day.<br><br>
+        Come back to these pages whenever you feel like you have forgotten something, or remind yourself every week of the framework we are following. Your consistency matters more than being perfect.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- BOTTOM NAV -->
+<div class="bot">
+  <button class="btn btn-soft" id="btn-back" onclick="go(-1)">Back</button>
+  <button class="btn btn-solid" id="btn-next" onclick="go(1)">Next</button>
+</div>
+
+<script>
+const TOTAL = 9;
+let cur = 0;
+
+const pipsEl = document.getElementById('pips');
+for (let i = 0; i < TOTAL; i++) {
+  const p = document.createElement('div');
+  p.className = 'pip' + (i === 0 ? ' on' : '');
+  p.onclick = () => goTo(i);
+  pipsEl.appendChild(p);
+}
+
+function goTo(idx) {
+  document.getElementById('page-' + cur).classList.remove('active');
+  cur = idx;
+  document.getElementById('page-' + cur).classList.add('active');
+  sync();
+  window.scrollTo({ top: 0 });
+}
+
+function go(dir) {
+  const n = cur + dir;
+  if (n < 0 || n >= TOTAL) return;
+  goTo(n);
+}
+
+function sync() {
+  document.querySelectorAll('.pip').forEach((p, i) => {
+    p.className = 'pip' + (i === cur ? ' on' : i < cur ? ' done' : '');
+  });
+  document.getElementById('cnt').textContent = (cur + 1) + ' of ' + TOTAL;
+  document.getElementById('btn-back').className = cur === 0 ? 'btn btn-off' : 'btn btn-soft';
+  document.getElementById('btn-next').textContent = cur === TOTAL - 1 ? 'Done' : 'Next';
+}
+
+sync();
+</script>
+</body>
+</html>
