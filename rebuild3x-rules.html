@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
 :root {
   --bg:          #080e1a;
@@ -30,6 +30,9 @@ body {
   font-family: 'DM Sans', sans-serif;
   line-height: 1.65;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* NAV */
@@ -109,8 +112,8 @@ body {
   overflow: hidden;
   /* midnight blue with radial center glow — matching the screenshot */
   background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, #0f2a5e 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 50% 20%, #0a1e48 0%, transparent 60%),
+    radial-gradient(ellipse 55% 40% at 50% 35%, #0f2a5e 0%, transparent 70%),
+    radial-gradient(ellipse 40% 28% at 50% 15%, #0a1e48 0%, transparent 60%),
     linear-gradient(180deg, #08101f 0%, #060c18 100%);
 }
 .cover-ghost {
@@ -229,7 +232,7 @@ body {
   font-size: 15px;
   color: var(--white-80);
   font-weight: 300;
-  line-height: 1.8;
+  line-height: 1.85;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--bg-border);
 }
@@ -244,7 +247,7 @@ body {
   font-size: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--white-50);
+  color: rgba(255,255,255,0.55);
   margin-bottom: 7px;
   font-weight: 400;
 }
@@ -257,9 +260,9 @@ body {
 }
 .blk-body {
   font-size: 14px;
-  color: var(--white-80);
+  color: rgba(255,255,255,0.85);
   font-weight: 300;
-  line-height: 1.85;
+  line-height: 1.9;
 }
 .blk-body strong { color: var(--white); font-weight: 500; }
 
@@ -275,7 +278,7 @@ body {
   font-size: 10px; font-weight: 600; color: var(--white);
   flex-shrink: 0; margin-top: 1px;
 }
-.step-text { font-size: 13px; color: var(--white-80); font-weight: 300; line-height: 1.7; }
+.step-text { font-size: 13px; color: rgba(255,255,255,0.82); font-weight: 300; line-height: 1.75; }
 .step-text strong { color: var(--white); font-weight: 500; }
 
 /* CALLOUT */
@@ -341,7 +344,7 @@ body {
   font-family: 'Instrument Serif', serif;
   font-size: 20px; margin-bottom: 7px; line-height: 1.2;
 }
-.meal-body { font-size: 14px; color: var(--white-80); font-weight: 300; line-height: 1.85; }
+.meal-body { font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 300; line-height: 1.9; }
 .meal-body strong { color: var(--white); font-weight: 500; }
 .meal-eg { margin-top: 8px; font-size: 12px; color: var(--white-50); font-weight: 300; line-height: 1.6; font-style: italic; }
 
@@ -371,7 +374,7 @@ body {
   font-size: 22px; color: var(--bg-border);
   line-height: 1; flex-shrink: 0; width: 20px;
 }
-.sum-text { font-size: 14px; color: var(--white-80); font-weight: 300; line-height: 1.7; }
+.sum-text { font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 300; line-height: 1.75; }
 .sum-text strong { color: var(--white); font-weight: 500; }
 .final-foot { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--bg-border); }
 .ff-name {
@@ -442,8 +445,8 @@ body {
       <div class="blk-body">Miss a session, come back the next day. Ate badly, start fresh in the morning. <strong>One slip is human. Two slips becomes a pattern.</strong> You do not restart. You continue. That is the whole difference.</div>
     </div>
     <div class="callout">
-      <div class="callout-label">Why three days works</div>
-      <div class="callout-body">Three sessions done for twelve months <em>always beats</em> six sessions done for six weeks.</div>
+      <div class="callout-label">The truth about consistency</div>
+      <div class="callout-body">Showing up three times a week, <em>every week,</em> is what actually moves the needle.</div>
     </div>
     <div class="blk">
       <div class="blk-label">My role</div>
