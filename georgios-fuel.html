@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0e0e0e">
+<title>Georgios — Rebuild 3X</title>
+<style>
+:root{--bg:#0e0e0e;--s1:#181818;--s2:#202020;--bd:#282828;--bd2:#323232;--acc:#c96424;--blue:#4a85b0;--grn:#2e8f5a;--red:#a83434;--txt:#cccccc;--txt2:#888;--txt3:#4a4a4a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.4;padding-bottom:80px;max-width:480px;margin:0 auto}
+
+#sbar{position:sticky;top:0;z-index:99;background:rgba(14,14,14,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);padding:9px 14px;display:flex;align-items:center;gap:12px}
+.bn-top{font-size:12px;font-weight:600;color:var(--txt);letter-spacing:-.01em}
+.bn-bot{font-size:9px;color:var(--txt3);letter-spacing:.07em;text-transform:uppercase;margin-top:1px}
+.bns{display:flex;gap:14px;margin-left:2px}
+.bv{display:flex;flex-direction:column;align-items:center}
+.bval{font-size:16px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.bval.p{color:var(--acc)}.bval.c{color:var(--blue)}
+.blbl{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.btgt{font-size:9px;color:var(--txt3);font-variant-numeric:tabular-nums}
+.bbars{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
+.pb{display:flex;align-items:center;gap:5px}
+.pbl{font-size:9px;color:var(--txt3);width:8px;flex-shrink:0}
+.pbbg{flex:1;height:3px;background:var(--bd2);border-radius:3px;overflow:hidden}
+.pbf{height:100%;border-radius:3px;transition:width .3s ease}
+.pbf.p{background:var(--acc)}.pbf.c{background:var(--blue)}
+
+#tabs{display:flex;border-bottom:1px solid var(--bd)}
+.tab{flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;color:var(--txt3);border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.tab.on{color:var(--acc);border-bottom-color:var(--acc)}
+
+.hd{padding:14px 14px 11px;border-bottom:1px solid var(--bd)}
+.hd-row{display:flex;justify-content:space-between;align-items:center}
+.hd-row h1{font-size:15px;font-weight:600;color:var(--txt);letter-spacing:-.01em}
+.r3x{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--txt3);border:1px solid var(--bd2);padding:2px 7px;border-radius:3px}
+.hd-sub{font-size:11px;color:var(--txt3);margin-top:3px}
+.hdg{display:flex;gap:6px;margin-top:8px}
+.hdb{font-size:10px;padding:2px 8px;border-radius:3px;border:1px solid var(--bd2);color:var(--txt3)}
+
+.slot{padding:12px 14px 0}
+.slot-hd{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.st{font-size:10px;color:var(--txt3);white-space:nowrap}
+.sn{font-size:12px;font-weight:600;color:var(--txt)}
+.plate-rule{font-size:10px;color:var(--txt3);margin-bottom:6px;padding:0 1px;line-height:1.5}
+.plate-rule b{color:var(--txt2)}
+.snack-lbl{font-size:10px;color:var(--txt3);margin-bottom:6px;font-style:italic}
+.opts{display:flex;flex-direction:column;gap:4px}
+.div{border:none;border-top:1px solid var(--bd);margin:14px 0 0}
+
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:9px 11px;cursor:pointer;display:flex;align-items:flex-start;gap:8px;position:relative;overflow:hidden;user-select:none}
+.card:active{opacity:.7}
+.card.sel{border-color:rgba(201,100,36,.45);background:rgba(201,100,36,.04)}
+.card.sel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--acc)}
+.cem{font-size:16px;width:20px;text-align:center;flex-shrink:0;padding-top:1px;line-height:1}
+.cbody{flex:1;min-width:0}
+.cname{font-size:11px;font-weight:600;line-height:1.35;color:var(--txt)}
+.cnote{font-size:10px;color:var(--txt3);margin-top:1px;line-height:1.3}
+.cwarn{font-size:10px;color:#9a7020;margin-top:2px;line-height:1.3}
+.cinfo{font-size:10px;color:var(--txt3);margin-top:2px;line-height:1.3}
+.cmac{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.mp{font-size:11px;font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums}
+.mc{font-size:10px;color:var(--txt3);font-variant-numeric:tabular-nums}
+.dot{width:13px;height:13px;border-radius:50%;border:1px solid var(--bd2);flex-shrink:0;position:relative;margin-top:2px}
+.card.sel .dot{background:var(--acc);border-color:var(--acc)}
+.card.sel .dot::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:7px;color:#fff;font-weight:700}
+
+.add-custom-btn{display:flex;align-items:center;gap:5px;margin-top:6px;padding:7px 10px;background:none;border:1px dashed var(--bd2);border-radius:7px;color:var(--txt3);font-size:11px;cursor:pointer;font-family:inherit}
+.add-custom-btn:active{background:var(--s2)}
+.add-custom-btn .plus{color:var(--acc);font-size:13px;font-weight:600;line-height:1}
+
+.extras{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.erow{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:8px 10px}
+.erow-top{display:flex;align-items:center;gap:6px;position:relative;margin-bottom:5px}
+.einp{flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:5px 8px;font-size:12px;color:var(--txt);font-family:inherit;outline:none;min-width:0}
+.einp:focus{border-color:var(--acc)}
+.einp::placeholder{color:var(--txt3)}
+.edel{width:20px;height:20px;border-radius:50%;background:none;border:1px solid var(--bd);color:var(--txt3);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;line-height:1}
+.edel:active{color:var(--red)}
+.erow-bot{display:flex;align-items:center;gap:8px}
+.ecp{font-size:11px;font-weight:600;color:var(--acc)}
+.ecc{font-size:10px;color:var(--txt3)}
+.eqty{display:flex;align-items:center;gap:4px;margin-left:auto}
+.eql{font-size:10px;color:var(--txt3)}
+.eqi{width:36px;background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:3px 5px;font-size:12px;color:var(--txt);font-family:inherit;text-align:center;outline:none}
+.eqi:focus{border-color:var(--acc)}
+.suggs{position:absolute;top:calc(100% + 2px);left:0;right:26px;background:#1a1a1a;border:1px solid var(--bd2);border-radius:7px;max-height:200px;overflow-y:auto;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,.9);display:none}
+.suggs.open{display:block}
+.sg-grp{font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--txt3);padding:7px 10px 3px}
+.sg{padding:7px 10px;font-size:11px;cursor:pointer;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:6px}
+.sg:last-child{border-bottom:none}
+.sg:active{background:var(--bd)}
+.sgn{color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sgm{font-size:10px;color:var(--txt3);white-space:nowrap;flex-shrink:0}
+
+.photobox{margin:14px 14px 0;padding:10px 12px;border:1px solid rgba(168,52,52,.3);border-radius:8px}
+.phtitle{font-size:11px;font-weight:700;color:var(--red);margin-bottom:2px}
+.phsub{font-size:10px;color:var(--txt3);line-height:1.5}
+
+#status{margin:10px 14px 0;padding:9px 12px;background:var(--s1);border:1px solid var(--bd);border-radius:8px;display:none;gap:7px;align-items:flex-start}
+#status.show{display:flex}
+#sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+#stxt{font-size:11px;color:var(--txt3);line-height:1.55}
+#stxt strong{color:var(--txt)}
+
+#wview{padding:14px}
+.whead{font-size:15px;font-weight:600;margin-bottom:2px}
+.wsub{font-size:11px;color:var(--txt3);margin-bottom:12px}
+.wempty{font-size:11px;color:var(--txt3);text-align:center;padding:28px 0;line-height:1.7}
+.wday{background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:11px;margin-bottom:7px}
+.wday-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.wdate{font-size:11px;font-weight:600;color:var(--txt)}
+.wbadge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px}
+.wbadge.hit{background:rgba(46,143,90,.1);color:var(--grn);border:1px solid rgba(46,143,90,.2)}
+.wbadge.miss{background:rgba(168,52,52,.1);color:var(--red);border:1px solid rgba(168,52,52,.2)}
+.wbars{display:flex;flex-direction:column;gap:6px}
+.wbr{display:flex;align-items:center;gap:7px}
+.wbrl{font-size:10px;color:var(--txt3);width:16px;flex-shrink:0}
+.wbrbg{flex:1;height:3px;background:var(--bd2);border-radius:3px;overflow:hidden}
+.wbrf{height:100%;border-radius:3px}
+.wval{font-size:10px;font-variant-numeric:tabular-nums;width:60px;text-align:right;flex-shrink:0}
+.wmls{margin-top:7px;display:flex;flex-wrap:wrap;gap:3px}
+.wml{font-size:10px;color:var(--txt3);background:var(--s2);padding:2px 6px;border-radius:3px;border:1px solid var(--bd)}
+.wsave{width:100%;margin-top:12px;padding:10px;background:none;border:1px solid var(--bd2);border-radius:8px;color:var(--txt3);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+.wsave:active{background:var(--s2)}
+.wdel{background:none;border:none;color:var(--txt3);font-size:11px;cursor:pointer;font-family:inherit;padding:2px 0;opacity:.5}
+.wdel:active{opacity:1}
+.wconfirm{margin-top:9px;padding:9px 10px;background:rgba(168,52,52,.08);border:1px solid rgba(168,52,52,.2);border-radius:7px;display:none}
+.wconfirm.show{display:block}
+.wconfirm-txt{font-size:11px;color:var(--txt3);margin-bottom:7px}
+.wconfirm-btns{display:flex;gap:7px}
+.wconfirm-yes{flex:1;padding:7px;background:rgba(168,52,52,.12);border:1px solid rgba(168,52,52,.25);border-radius:6px;color:var(--red);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.wconfirm-yes:active{background:rgba(168,52,52,.22)}
+.wconfirm-no{flex:1;padding:7px;background:none;border:1px solid var(--bd2);border-radius:6px;color:var(--txt3);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.wconfirm-no:active{background:var(--s2)}
+</style>
+</head>
+<body>
+
+<div id="sbar">
+  <div><div class="bn-top">Georgios</div><div class="bn-bot">Rebuild 3X</div></div>
+  <div class="bns">
+    <div class="bv"><span class="bval p" id="tp">0g</span><span class="blbl">protein</span><span class="btgt">/ 170g</span></div>
+    <div class="bv"><span class="bval c" id="tc">0</span><span class="blbl">kcal</span><span class="btgt">≈ 2300</span></div>
+  </div>
+  <div class="bbars">
+    <div class="pb"><span class="pbl">P</span><div class="pbbg"><div class="pbf p" id="bp" style="width:0%"></div></div></div>
+    <div class="pb"><span class="pbl">C</span><div class="pbbg"><div class="pbf c" id="bc" style="width:0%"></div></div></div>
+  </div>
+</div>
+
+<div id="tabs">
+  <div class="tab on" onclick="showTab('today',this)">Today</div>
+  <div class="tab" onclick="showTab('week',this)">Week</div>
+</div>
+
+<div id="today">
+  <div class="hd">
+    <div class="hd-row"><h1>Georgios, your daily plan.</h1><span class="r3x">Rebuild 3X</span></div>
+    <div class="hd-sub">Tap to select. + to add extras. Fully offline.</div>
+    <div class="hdg"><span class="hdb">🥩 170g protein</span><span class="hdb">⚡ ≈2300 kcal</span></div>
+  </div>
+  <div id="mslots"></div>
+  <div class="photobox">
+    <div class="phtitle">📸 Send a photo after each meal</div>
+    <div class="phsub">Send me a photo of your plate on Trainerize. I check every day.</div>
+  </div>
+  <div id="status"><div id="sdot"></div><div id="stxt"></div></div>
+  <div style="height:24px"></div>
+</div>
+
+<div id="wview" style="display:none">
+  <div class="whead">This week</div>
+  <div class="wsub">Auto-saves daily. Visible to you and Kyriakos.</div>
+  <div id="wlist"></div>
+  <button class="wsave" onclick="saveToday()">Save today</button>
+</div>
+
+<script>
+var PT=170,CT=2300;
+
+var SLOTS=[
+{id:'bk',time:'7:00–8:30am',name:'Breakfast',
+ rule:'<b>½</b> protein · <b>¼</b> carbs · <b>¼</b> veg or fruit',snack:false,
+ items:[
+  {e:'🍳',n:'4 eggs + 2 wholegrain toast',no:'🏠 7 min',p:32,c:480},
+  {e:'🧀',n:'4 egg omelette + cheddar + spinach',no:'🏠 8 min',p:33,c:435},
+  {e:'🥚',n:'4 eggs + 3 turkey rashers + 1 toast',no:'🏠 10 min',p:39,c:470},
+  {e:'🥛',n:'Greek yogurt 0–2% 200g + 2 eggs + fruit',no:'🏠 2 min · boil eggs night before',p:33,c:355},
+  {e:'🐟',n:'Big tin tuna + 3 eggs + 1 toast',no:'🏠 7 min · big tin = 25g protein',p:46,c:460},
+  {e:'🥚',n:'3 boiled eggs + Greek yogurt 200g + fruit',no:'🏠 1 min · boil eggs night before',p:38,c:440},
+  {e:'⚡',n:'Greek yogurt 200g + high protein bar',no:'🏃 Zero cooking',p:42,c:335},
+]},
+{id:'s1',time:'10:00–11:00am',name:'Morning snack',rule:null,snack:true,
+ items:[
+  {e:'💪',n:'High protein bar (low sugar, 20g+)',no:'🏪 Any supermarket',p:22,c:210},
+  {e:'🧃',n:'Protein shake ready to drink',no:'🏪 Tesco · Sainsbury\'s · stations',p:20,c:130},
+  {e:'🥚',n:'2 boiled eggs + fruit (any)',no:'🏠 Carry from home',p:13,c:195},
+  {e:'🥛',n:'Greek yogurt 0–2% 170g',no:'🏪 Any supermarket fridge',p:17,c:105},
+  {e:'🥩',n:'Beef jerky 40g',no:'🏪 Any garage · WH Smith',p:20,c:110},
+  {e:'🍶',n:'Quark 200g + fruit (any)',no:'🏪 Tesco · Lidl · Aldi',p:23,c:190},
+  {e:'🥚',n:'3 boiled eggs',no:'🏠 Nothing to buy',p:18,c:234},
+  {e:'🧀',n:'Cottage cheese 150g + fruit (any)',no:'🏪 Any supermarket',p:18,c:180},
+]},
+{id:'ln',time:'12:30–1:30pm',name:'Lunch',
+ rule:'<b>½</b> protein · <b>¼</b> carbs · <b>¼</b> veg',snack:false,
+ items:[
+  {e:'🐟',n:'Tuna pasta pot + protein shake',no:'🏪 Same shop · always get both',w:'⚠️ Pasta pot alone = 7g. Shake brings total to 27g.',p:27,c:320},
+  {e:'🥫',n:'Big tin tuna + 4 rice cakes + fruit',no:'🏠 Pack from home · 3 min',info:'Big tin 145g = 25g · Small tin 80g = 13g',p:29,c:320},
+  {e:'🐟',n:'Big tin tuna + protein bar + fruit',no:'🏪 Tuna from home · grab bar anywhere',p:47,c:415},
+  {e:'🥗',n:'Supermarket chicken salad pot + yogurt',no:'🏪 Sainsbury\'s · Tesco · M&S',p:42,c:400},
+  {e:'🌯',n:'Supermarket chicken wrap + yogurt pot',no:'🏪 Any supermarket · skip the crisps',p:45,c:455},
+  {e:'🥚',n:'3 boiled eggs + protein bar + fruit',no:'🏠 All from home',p:40,c:520},
+  {e:'🥙',n:'Chicken or tuna sandwich + yogurt pot',no:'🏪 Any café · petrol station',p:40,c:450},
+  {e:'🥫',n:'2 big tins tuna + rice cakes',no:'🏠 Highest protein lunch · pack from home',info:'2 tins = 50g protein',p:53,c:395},
+]},
+{id:'s2',time:'3:30–5:00pm',name:'Afternoon snack',rule:null,snack:true,
+ items:[
+  {e:'💪',n:'High protein bar (low sugar, 20g+)',no:'🏪 Any supermarket',p:22,c:210},
+  {e:'🧃',n:'Protein shake ready to drink',no:'🏪 Tesco · Sainsbury\'s · stations',p:20,c:130},
+  {e:'🥚',n:'2 boiled eggs',no:'🏠 Carry from home',p:13,c:156},
+  {e:'🥛',n:'Greek yogurt 0–2% 170g',no:'🏪 Any supermarket fridge',p:17,c:105},
+  {e:'🥩',n:'Beef jerky 40g',no:'🏪 Any garage · WH Smith',p:20,c:110},
+  {e:'🍶',n:'Quark 200g',no:'🏪 Tesco · Lidl · Aldi',p:22,c:115},
+  {e:'🥚',n:'3 boiled eggs',no:'🏠 Nothing to buy',p:18,c:234},
+  {e:'🧀',n:'Cottage cheese 150g',no:'🏪 Any supermarket',p:18,c:150},
+]},
+{id:'dn',time:'After 6pm',name:'After work meal',
+ rule:'<b>½</b> protein · <b>¼ or less</b> carbs — keep it small tonight · <b>¼+</b> veg',snack:false,
+ items:[
+  {e:'🍗',n:'Chicken breast 250g + rice + veg',no:'🏠 Plate rule · 15 min',p:72,c:600},
+  {e:'🐟',n:'Salmon 200g + sweet potato + broccoli',no:'🏠 Plate rule · 20 min',p:50,c:580},
+  {e:'🥫',n:'2 big tins tuna + pasta + olive oil + tomatoes',no:'🏠 Pantry staples · 12 min',info:'2 tins = 50g protein',p:54,c:495},
+  {e:'🥩',n:'Beef mince 5% 250g + pasta + veg',no:'🏠 Plate rule · 15 min',p:58,c:530},
+  {e:'🥚',n:'5 eggs + 4 turkey rashers + veg',no:'🏠 10 min · lowest carb',p:54,c:495},
+  {e:'🍗',n:'Chicken thigh 250g + rice + veg',no:'🏠 Plate rule · 20 min',p:65,c:680},
+  {e:'🥫',n:'Big tin tuna + 4 eggs + veg (no carbs)',no:'🏠 10 min · lowest calorie',info:'Big tin = 25g protein',p:50,c:430},
+  {e:'🥩',n:'Pork loin 250g + sweet potato + veg',no:'🏠 Lean cut · plate rule · 20 min',p:68,c:580},
+]},
+];
+
+var SEARCH=[
+  {grp:'Ready meals',items:[
+    {n:'Chicken breast 250g + rice + veg',p:72,c:600},
+    {n:'Salmon 200g + sweet potato + broccoli',p:50,c:580},
+    {n:'2 tins tuna + pasta + olive oil',p:54,c:495},
+    {n:'Beef mince 250g + pasta + veg',p:58,c:530},
+    {n:'5 eggs + turkey rashers + veg',p:54,c:495},
+    {n:'4 egg omelette + cheddar + spinach',p:33,c:435},
+    {n:'3 eggs + 2 toast',p:26,c:415},
+    {n:'Supermarket chicken salad pot',p:25,c:300},
+    {n:'Supermarket chicken wrap',p:28,c:350},
+    {n:'Tuna pasta pot store',p:7,c:190},
+    {n:'Chicken or tuna sandwich',p:18,c:280},
+    {n:'Greek yogurt 200g + protein bar',p:42,c:335},
+    {n:'Tuna + rice cakes (2 tins)',p:53,c:395},
+    {n:'3 boiled eggs + protein bar + fruit',p:40,c:520},
+  ]},
+  {grp:'Ingredients',items:[
+    {n:'Egg x1',p:6,c:78},{n:'Egg x2',p:12,c:156},{n:'Egg x3',p:18,c:234},{n:'Egg x4',p:24,c:312},{n:'Egg x5',p:30,c:390},
+    {n:'Chicken breast 100g',p:31,c:165},{n:'Chicken breast 200g',p:62,c:330},{n:'Chicken breast 250g',p:77,c:413},
+    {n:'Chicken thigh 200g',p:52,c:400},{n:'Chicken thigh 250g',p:65,c:500},
+    {n:'Tuna big tin 145g',p:25,c:130},{n:'Tuna small tin 80g',p:13,c:70},
+    {n:'Salmon 180g',p:40,c:375},{n:'Salmon 200g',p:44,c:417},
+    {n:'Beef mince 5% 200g',p:42,c:260},{n:'Beef mince 5% 250g',p:52,c:325},
+    {n:'Pork loin 250g',p:72,c:450},{n:'Turkey rashers x2',p:10,c:60},{n:'Turkey rashers x4',p:20,c:120},
+    {n:'High protein bar',p:22,c:210},{n:'Protein shake RTD',p:20,c:130},
+    {n:'Greek yogurt 0-2% 170g',p:17,c:102},{n:'Greek yogurt 0-2% 200g',p:20,c:120},
+    {n:'Quark 200g',p:22,c:115},{n:'Cottage cheese 150g',p:18,c:148},
+    {n:'Cheddar 30g',p:7,c:121},{n:'Beef jerky 40g',p:20,c:110},
+    {n:'Wholegrain bread 1 slice',p:4,c:90},{n:'Rice cooked 100g',p:3,c:130},
+    {n:'Pasta cooked 100g',p:4,c:155},{n:'Sweet potato 100g',p:2,c:90},
+    {n:'Oats 40g',p:5,c:150},{n:'Rice cake x1',p:1,c:35},
+    {n:'Broccoli 100g',p:3,c:34},{n:'Spinach 100g',p:3,c:23},
+    {n:'Mixed veg 100g',p:2,c:40},{n:'Tomato 100g',p:1,c:18},
+    {n:'Fruit any medium',p:1,c:80},{n:'Banana',p:1,c:105},{n:'Apple',p:0,c:80},
+    {n:'Olive oil 1 tbsp',p:0,c:119},{n:'Sardines tin 120g',p:23,c:180},
+    {n:'Ham slice 30g',p:5,c:45},{n:'Milk 200ml',p:7,c:98},
+  ]},
+];
+
+var state={sel:{},extras:{}};
+var eid=0;
+
+function today(){return new Date().toISOString().split('T')[0]}
+
+function loadState(){
+  try{
+    var d=today(),saved=localStorage.getItem('r3x_date');
+    if(saved&&saved!==d){
+      var prev=JSON.parse(localStorage.getItem('r3x_state')||'null');
+      if(prev&&Object.keys(prev.sel||{}).length>0){
+        var t=calcTotals(prev.sel,prev.extras);
+        var lib=JSON.parse(localStorage.getItem('r3x_lib')||'[]');
+        lib=lib.filter(function(x){return x.date!==saved});
+        lib.unshift({date:saved,tp:t.p,tc:t.c,sel:prev.sel});
+        if(lib.length>14)lib.pop();
+        localStorage.setItem('r3x_lib',JSON.stringify(lib));
+      }
+      localStorage.setItem('r3x_date',d);
+      localStorage.setItem('r3x_state',JSON.stringify({sel:{},extras:{}}));
+    }else if(!saved){
+      localStorage.setItem('r3x_date',d);
+      localStorage.setItem('r3x_state',JSON.stringify({sel:{},extras:{}}));
+    }else{
+      var s=JSON.parse(localStorage.getItem('r3x_state')||'{}');
+      state.sel=s.sel||{};state.extras=s.extras||{};
+    }
+  }catch(e){}
+}
+
+function saveState(){try{localStorage.setItem('r3x_state',JSON.stringify({sel:state.sel,extras:state.extras}));}catch(e){}}
+
+function saveToday(){
+  try{
+    var d=today(),t=calcTotals(state.sel,state.extras);
+    var lib=JSON.parse(localStorage.getItem('r3x_lib')||'[]');
+    lib=lib.filter(function(x){return x.date!==d});
+    lib.unshift({date:d,tp:t.p,tc:t.c,sel:state.sel});
+    if(lib.length>14)lib.pop();
+    localStorage.setItem('r3x_lib',JSON.stringify(lib));
+  }catch(e){}
+  renderWeek();
+}
+
+function calcTotals(sel,extras){
+  var p=0,c=0;
+  Object.values(sel||{}).forEach(function(s){p+=s.p||0;c+=s.c||0});
+  Object.values(extras||{}).forEach(function(arr){
+    (arr||[]).forEach(function(r){if(r.p>0){p+=Math.round(r.p*(r.qty||1));c+=Math.round(r.c*(r.qty||1))}});
+  });
+  return{p:p,c:c};
+}
+
+function update(){
+  var t=calcTotals(state.sel,state.extras);
+  document.getElementById('tp').textContent=t.p+'g';
+  document.getElementById('tc').textContent=t.c;
+  document.getElementById('bp').style.width=Math.min(t.p/PT*100,100)+'%';
+  document.getElementById('bc').style.width=Math.min(t.c/CT*100,100)+'%';
+  var filled=SLOTS.filter(function(s){return state.sel[s.id]}).length;
+  var el=document.getElementById('status'),dot=document.getElementById('sdot'),txt=document.getElementById('stxt');
+  if(filled>=3){
+    el.classList.add('show');
+    if(t.p>=PT&&t.c<=CT+150){dot.style.background='#2e8f5a';txt.innerHTML='<strong>On track.</strong> '+t.p+'g protein · '+t.c+' kcal.';}
+    else if(t.p<PT){dot.style.background='#c96424';txt.innerHTML='<strong>Protein short by '+(PT-t.p)+'g.</strong> Add a shake or bar.';}
+    else{dot.style.background='#4a85b0';txt.innerHTML='<strong>'+(t.c-CT)+' kcal over.</strong> Swap dinner to eggs + turkey rashers.';}
+  }else{el.classList.remove('show');}
+  saveState();
+}
+
+function renderSlots(){
+  var el=document.getElementById('mslots');if(!el)return;
+  var html='';
+  SLOTS.forEach(function(slot,si){
+    if(si>0)html+='<div class="div"></div>';
+    html+='<div class="slot"><div class="slot-hd"><span class="st">'+slot.time+'</span><span class="sn">'+slot.name+'</span></div>';
+    if(slot.rule)html+='<div class="plate-rule">'+slot.rule+'</div>';
+    if(slot.snack)html+='<div class="snack-lbl">Optional — only if hungry</div>';
+    html+='<div class="opts" id="o-'+slot.id+'">';
+    slot.items.forEach(function(it){
+      var issel=state.sel[slot.id]&&state.sel[slot.id].n===it.n;
+      var itj=JSON.stringify(it).replace(/"/g,'&quot;');
+      html+='<div class="card'+(issel?' sel':'')+'" onclick="pick(this,\''+slot.id+'\','+itj+')">';
+      html+='<span class="cem">'+it.e+'</span><div class="cbody"><div class="cname">'+it.n+'</div><div class="cnote">'+it.no+'</div>';
+      if(it.w)html+='<div class="cwarn">'+it.w+'</div>';
+      if(it.info)html+='<div class="cinfo">'+it.info+'</div>';
+      html+='</div><div class="cmac"><span class="mp">'+it.p+'g</span><span class="mc">'+it.c+'</span></div><div class="dot"></div></div>';
+    });
+    html+='</div><div class="extras" id="ex-'+slot.id+'"></div>';
+    html+='<button class="add-custom-btn" onclick="addExtra(\''+slot.id+'\')"><span class="plus">+</span> Add custom meal</button></div>';
+  });
+  el.innerHTML=html;
+  SLOTS.forEach(function(s){renderExtras(s.id);});
+}
+
+function pick(card,slotId,it){
+  if(card.classList.contains('sel')){card.classList.remove('sel');delete state.sel[slotId];}
+  else{
+    var cards=document.querySelectorAll('#o-'+slotId+' .card');
+    for(var i=0;i<cards.length;i++)cards[i].classList.remove('sel');
+    card.classList.add('sel');state.sel[slotId]={n:it.n,p:it.p,c:it.c};
+  }
+  update();
+}
+
+function addExtra(slotId){
+  if(!state.extras[slotId])state.extras[slotId]=[];
+  state.extras[slotId].push({id:eid++,name:'',p:0,c:0,qty:1});
+  renderExtras(slotId);
+}
+
+function removeExtra(slotId,id){
+  if(!state.extras[slotId])return;
+  state.extras[slotId]=state.extras[slotId].filter(function(r){return r.id!==id});
+  renderExtras(slotId);update();
+}
+
+function renderExtras(slotId){
+  var el=document.getElementById('ex-'+slotId);if(!el)return;
+  var rows=state.extras[slotId]||[];
+  if(!rows.length){el.innerHTML='';return;}
+  var html='';
+  rows.forEach(function(r){
+    html+='<div class="erow"><div class="erow-top">';
+    html+='<input class="einp" id="ei-'+r.id+'" placeholder="Type meal or ingredient..." value="'+r.name+'" oninput="onEInput(\''+slotId+'\','+r.id+',this.value)" autocomplete="off" autocorrect="off" spellcheck="false">';
+    html+='<div class="suggs" id="esg-'+r.id+'"></div>';
+    html+='<button class="edel" onclick="removeExtra(\''+slotId+'\','+r.id+')">×</button>';
+    html+='</div><div class="erow-bot">';
+    html+='<span class="ecp" id="ecp-'+r.id+'">'+Math.round(r.p*(r.qty||1))+'g</span>';
+    html+='<span class="ecc" id="ecc-'+r.id+'">'+Math.round(r.c*(r.qty||1))+' kcal</span>';
+    html+='<div class="eqty"><span class="eql">×</span><input class="eqi" type="number" min="0.5" max="20" step="0.5" value="'+(r.qty||1)+'" oninput="onEQty(\''+slotId+'\','+r.id+',this.value)"></div>';
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+function buildSuggestions(val){
+  var q=val.toLowerCase();var html='';
+  SEARCH.forEach(function(grp){
+    var m=grp.items.filter(function(f){return f.n.toLowerCase().indexOf(q)>=0}).slice(0,5);
+    if(!m.length)return;
+    html+='<div class="sg-grp">'+grp.grp+'</div>';
+    m.forEach(function(f){
+      var fn=f.n.replace(/'/g,"\\'");
+      html+='<div class="sg" onmousedown="selFood(event,\'_SLOT_\',_ID_,\''+fn+'\','+f.p+','+f.c+')">';
+      html+='<span class="sgn">'+f.n+'</span><span class="sgm">'+f.p+'g · '+f.c+'</span></div>';
+    });
+  });
+  return html;
+}
+
+function onEInput(slotId,id,val){
+  var rows=state.extras[slotId]||[];var row=null;
+  for(var i=0;i<rows.length;i++)if(rows[i].id===id){row=rows[i];break;}
+  if(!row)return;row.name=val;
+  var sg=document.getElementById('esg-'+id);if(!sg)return;
+  if(!val.trim()){sg.innerHTML='';sg.classList.remove('open');return;}
+  var html=buildSuggestions(val);
+  if(!html){sg.innerHTML='';sg.classList.remove('open');return;}
+  html=html.replace(/_SLOT_/g,slotId).replace(/_ID_/g,id);
+  sg.innerHTML=html;sg.classList.add('open');
+}
+
+function selFood(e,slotId,id,name,p,c){
+  e.preventDefault();
+  var rows=state.extras[slotId]||[];var row=null;
+  for(var i=0;i<rows.length;i++)if(rows[i].id===id){row=rows[i];break;}
+  if(!row)return;
+  row.name=name;row.p=p;row.c=c;
+  var inp=document.getElementById('ei-'+id);if(inp)inp.value=name;
+  var sg=document.getElementById('esg-'+id);if(sg){sg.innerHTML='';sg.classList.remove('open');}
+  var pe=document.getElementById('ecp-'+id);var ce=document.getElementById('ecc-'+id);
+  if(pe)pe.textContent=Math.round(p*(row.qty||1))+'g';
+  if(ce)ce.textContent=Math.round(c*(row.qty||1))+' kcal';
+  update();
+}
+
+function onEQty(slotId,id,val){
+  var rows=state.extras[slotId]||[];var row=null;
+  for(var i=0;i<rows.length;i++)if(rows[i].id===id){row=rows[i];break;}
+  if(!row)return;
+  row.qty=Math.max(0.5,parseFloat(val)||1);
+  var pe=document.getElementById('ecp-'+id);var ce=document.getElementById('ecc-'+id);
+  if(pe)pe.textContent=Math.round(row.p*row.qty)+'g';
+  if(ce)ce.textContent=Math.round(row.c*row.qty)+' kcal';
+  update();
+}
+
+document.addEventListener('click',function(e){
+  if(!e.target.classList.contains('einp')){
+    var sgs=document.querySelectorAll('.suggs');
+    for(var i=0;i<sgs.length;i++)sgs[i].classList.remove('open');
+  }
+});
+
+function showTab(id,btn){
+  document.getElementById('today').style.display=id==='today'?'block':'none';
+  document.getElementById('wview').style.display=id==='week'?'block':'none';
+  var tabs=document.querySelectorAll('.tab');
+  for(var i=0;i<tabs.length;i++)tabs[i].classList.remove('on');
+  btn.classList.add('on');
+  if(id==='week')renderWeek();
+}
+
+function fmtDate(d){
+  try{return new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});}
+  catch(e){return d;}
+}
+
+function renderWeek(){
+  var el=document.getElementById('wlist');if(!el)return;
+  var lib=[];try{lib=JSON.parse(localStorage.getItem('r3x_lib')||'[]');}catch(e){}
+  if(!lib.length){
+    el.innerHTML='<div class="wempty">No days saved yet.<br>Opens automatically the next morning.</div>';return;
+  }
+  var html='';
+  lib.slice(0,7).forEach(function(day){
+    var hitP=day.tp>=PT,hitC=day.tc<=CT+150,hit=hitP&&hitC;
+    var ppct=Math.min(day.tp/PT*100,100).toFixed(0);
+    var cpct=Math.min(day.tc/CT*100,100).toFixed(0);
+    var pc=hitP?'#2e8f5a':day.tp>=140?'#9a7020':'#a83434';
+    var cc=hitC?'#2e8f5a':day.tc<=CT+300?'#9a7020':'#a83434';
+    var meals='';
+    Object.values(day.sel||{}).forEach(function(s){if(s.n)meals+='<span class="wml">'+s.n.split('+')[0].trim()+'</span>';});
+    html+='<div class="wday" id="wd-'+day.date+'"><div class="wday-hd"><span class="wdate">'+fmtDate(day.date)+'</span>';
+    html+='<div style="display:flex;align-items:center;gap:8px"><span class="wbadge '+(hit?'hit':'miss')+'">'+(hit?'On track':'Off track')+'</span>';
+    html+='<button class="wdel" onclick="askDelete(\''+day.date+'\')">Remove</button></div></div>';
+    html+='<div class="wbars">';
+    html+='<div class="wbr"><span class="wbrl">P</span><div class="wbrbg"><div class="wbrf" style="width:'+ppct+'%;background:'+pc+'"></div></div><span class="wval" style="color:'+pc+'">'+day.tp+'g / 170g</span></div>';
+    html+='<div class="wbr"><span class="wbrl">C</span><div class="wbrbg"><div class="wbrf" style="width:'+cpct+'%;background:'+cc+'"></div></div><span class="wval" style="color:'+cc+'">'+day.tc+' kcal</span></div>';
+    html+='</div>'+(meals?'<div class="wmls">'+meals+'</div>':'');
+    html+='<div class="wconfirm" id="wc-'+day.date+'">';
+    html+='<div class="wconfirm-txt">Remove '+fmtDate(day.date)+' from the library?</div>';
+    html+='<div class="wconfirm-btns">';
+    html+='<button class="wconfirm-no" onclick="cancelDelete(\''+day.date+'\')">Keep it</button>';
+    html+='<button class="wconfirm-yes" onclick="confirmDelete(\''+day.date+'\')">Yes, remove</button>';
+    html+='</div></div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function askDelete(date){
+  var wc=document.getElementById('wc-'+date);
+  if(wc)wc.classList.add('show');
+}
+function cancelDelete(date){
+  var wc=document.getElementById('wc-'+date);
+  if(wc)wc.classList.remove('show');
+}
+function confirmDelete(date){
+  try{
+    var lib=JSON.parse(localStorage.getItem('r3x_lib')||'[]');
+    lib=lib.filter(function(x){return x.date!==date});
+    localStorage.setItem('r3x_lib',JSON.stringify(lib));
+  }catch(e){}
+  renderWeek();
+}
+
+loadState();renderSlots();update();
+</script>
+</body>
+</html>
