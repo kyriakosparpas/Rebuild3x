@@ -37,7 +37,7 @@
   /* Custom cursor */
   .cursor {
     position: fixed;
-    width: 8px; height: 8px;
+    width: 5px; height: 5px;
     background: var(--white);
     border-radius: 50%;
     pointer-events: none;
@@ -45,14 +45,7 @@
     transform: translate(-50%, -50%);
   }
   .cursor-ring {
-    position: fixed;
-    width: 32px; height: 32px;
-    border: 1px solid rgba(74,127,212,0.5);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform 0.12s ease;
+    display: none;
   }
 
   /* Subtle noise */
@@ -320,13 +313,15 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--accent);
     text-decoration: none;
     font-weight: 500;
     transition: gap 0.2s;
+    border: 1px solid var(--accent);
+    padding: 12px 24px;
   }
   .step-link:hover { gap: 14px; }
   .step-note {
@@ -705,10 +700,10 @@
 
 <!-- FINAL CTA -->
 <div class="final-cta">
-  <h2 class="section-title reveal">You're In.<br>Now Move.</h2>
+  <h2 class="section-title reveal">You're In.<br>Let's Move.</h2>
   <div class="reveal">
-    <a href="https://tally.so/r/w78ZD6" class="btn" style="margin: 8px;">Fill Intake Form →</a>
-    <a href="https://cal.eu/kyriakos-parpas/15min" class="btn btn-ghost" style="margin: 8px;">Book Kickoff Call →</a>
+    <a href="https://tally.so/r/w78ZD6" class="btn" style="margin: 8px; padding: 24px 52px; font-size: 15px;">Fill Intake Form →</a>
+    <a href="https://cal.eu/kyriakos-parpas/15min" class="btn btn-ghost" style="margin: 8px; padding: 24px 52px; font-size: 15px;">Book Kickoff Call →</a>
   </div>
 </div>
 
