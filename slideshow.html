@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rebuild 3X</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ── OUTER SHELL ── */
+html,body{
+  width:100%;height:100%;
+  overflow:hidden;
+  background:#07121f;
+  display:flex;align-items:center;justify-content:center;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
+}
+
+/* ── STAGE: the presentation card ── */
+/* Sits centred with space around it — screenshot-ready */
+.stage{
+  position:relative;
+  width:  min(92vw, 860px);
+  height: min(88vh, 560px);
+  background:#0c1e38;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,0.65),
+             0 0 0 1px rgba(255,255,255,0.05);
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── PROGRESS BAR ── */
+.prog{
+  display:flex;gap:4px;
+  padding:14px 24px 0;
+  flex-shrink:0;
+}
+.p{flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,0.07);transition:background .3s}
+.p.done{background:rgba(255,255,255,0.22)}
+.p.now{background:#4a7fcb}
+
+/* ── SLIDE AREA ── */
+.slides{flex:1;overflow:hidden;position:relative}
+.slide{
+  position:absolute;inset:0;
+  padding:18px 28px 14px;
+  display:none;flex-direction:column;
+  overflow:hidden;
+  animation:fadeUp .25s ease;
+}
+.slide.on{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── NAV BAR ── */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 24px 14px;
+  flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+.nav button{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);
+  padding:7px 20px;border-radius:8px;
+  cursor:pointer;font-size:12px;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;
+  transition:all .2s;
+}
+.nav button:hover:not(:disabled){background:rgba(255,255,255,0.12);color:#fff}
+.nav button:disabled{opacity:.25;cursor:default}
+.nav button#nx{background:rgba(74,127,203,0.18);border-color:rgba(74,127,203,0.4);color:#7aabf0}
+.nav button#nx:hover:not(:disabled){background:rgba(74,127,203,0.3);color:#fff}
+.ctr{font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px}
+
+/* ── SLIDE TYPOGRAPHY ── */
+.lbl{font-size:9px;font-weight:700;letter-spacing:3px;color:#4a7fcb;text-transform:uppercase;margin-bottom:9px;flex-shrink:0}
+h1{font-size:21px;font-weight:800;line-height:1.2;margin-bottom:12px;flex-shrink:0;color:#fff}
+h2{font-size:17px;font-weight:700;line-height:1.25;margin-bottom:10px;flex-shrink:0;color:#fff}
+h1 u,h2 u{text-decoration-color:rgba(255,255,255,0.25);text-decoration-thickness:2px;text-underline-offset:4px}
+
+/* ── FLOW LINES ── */
+.flow{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.fl{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.fl:last-child{border-bottom:none}
+.fl.s{color:#fff;font-weight:600}
+.fl.q{border-left:2px solid rgba(74,127,203,0.5);padding-left:12px;color:rgba(255,255,255,0.6);font-size:12.5px;border-bottom:none;margin-top:4px}
+
+/* ── BULLETS ── */
+ul.b{list-style:none;flex:1;overflow:hidden}
+ul.b li{display:flex;align-items:flex-start;gap:9px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12.5px;color:rgba(255,255,255,0.7);line-height:1.5}
+ul.b li:last-child{border-bottom:none}
+.dot{font-size:15px;flex-shrink:0;margin-top:1px}
+.dw{color:rgba(255,255,255,0.28)}
+.db{color:#4a7fcb}
+
+/* ── BELIEFS ── */
+.beliefs{display:flex;flex-direction:column;gap:6px;flex:1;overflow:hidden}
+.belief{border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:9px 13px;font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;background:rgba(255,255,255,0.03)}
+.belief b{color:#fff;font-weight:600}
+.aside{border-left:2px solid rgba(74,127,203,0.6);padding:9px 13px;margin-top:8px;font-size:12.5px;color:rgba(255,255,255,0.78);line-height:1.6;background:rgba(74,127,203,0.06);border-radius:0 8px 8px 0;flex-shrink:0}
+.aside b{color:#fff;font-weight:700}
+
+/* ── STATS ── */
+.stats{display:flex;gap:7px;margin-bottom:10px;flex-shrink:0}
+.st{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:9px 12px}
+.sn{font-size:19px;font-weight:800;color:#fff;line-height:1;margin-bottom:3px}
+.sl{font-size:10px;color:rgba(255,255,255,0.32);line-height:1.4}
+
+.chart-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:10px 14px 6px;margin-top:8px;flex-shrink:0}
+.chart-title{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.chart-src{font-size:9px;color:rgba(255,255,255,0.15);margin-top:4px;text-align:right}
+.chart-box canvas{flex:1;min-height:0 !important;max-height:100% !important}
+
+/* ── PHOTO FRAMES 9:16 ── */
+.photos{display:flex;gap:18px;justify-content:center;flex:1;align-items:center}
+.photo-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.photo-frame{
+  width:100px;height:178px;
+  border:1.5px solid rgba(255,255,255,0.13);border-radius:9px;
+  overflow:hidden;position:relative;
+  background:rgba(255,255,255,0.04);cursor:pointer;
+  transition:border-color .2s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+}
+.photo-frame:hover{border-color:rgba(74,127,203,0.6)}
+.photo-frame input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2}
+.photo-icon{font-size:18px;opacity:0.28;pointer-events:none}
+.photo-txt{font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase;text-align:center;pointer-events:none}
+.photo-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px;z-index:1}
+.photo-label{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:1.5px;text-transform:uppercase}
+
+/* ── CTA SLIDE ── */
+.cta-wrap{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:14px;
+  background:linear-gradient(135deg,rgba(74,127,203,0.1),rgba(12,30,56,0.5));
+  border:1px solid rgba(74,127,203,0.15);border-radius:12px;padding:24px;
+}
+.cta-wrap p{font-size:14.5px;color:rgba(255,255,255,0.7);line-height:1.8}
+.cta-wrap strong{color:#fff;font-weight:700}
+
+/* ── FORCE LANDSCAPE IN PORTRAIT (Instagram in-app browser fix) ── */
+@media (orientation:portrait) and (max-width:500px){
+  body{
+    overflow:hidden;
+  }
+  .stage{
+    /* Rotate the stage 90deg and swap width/height so it fills the landscape frame */
+    transform-origin: center center;
+    transform: rotate(90deg);
+    width:  min(88vh, 560px)  !important;
+    height: min(92vw, 360px)  !important;
+    border-radius:14px;
+  }
+  /* When rotated, shrink text slightly to fit the shorter dimension */
+  h1{font-size:18px !important}
+  h2{font-size:15px !important}
+  .fl{font-size:12px !important;padding:5px 0 !important}
+  ul.b li{font-size:12px !important;padding:5px 0 !important}
+  .belief{font-size:12px !important;padding:7px 11px !important}
+  .slide{padding:14px 22px 10px !important}
+  .prog{padding:10px 18px 0 !important}
+  .nav{padding:7px 18px 10px !important}
+  .nav button{padding:5px 14px !important;font-size:11px !important}
+}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- PROGRESS -->
+  <div class="prog" id="prog"></div>
+
+  <!-- SLIDES -->
+  <div class="slides">
+
+    <!-- 1 OPENING STAT -->
+    <div class="slide" id="s0">
+      <div class="lbl">Something worth paying attention to</div>
+      <h1>Why are so many men above 25<br><u>still out of shape?</u></h1>
+      <div class="flow">
+        <div class="fl">Male obesity in the US went from ~27% in 2000 to over 40% by 2020. Not a small shift.</div>
+        <div class="fl">And it is not because men stopped caring. Most men I know want to be in shape.</div>
+        <div class="fl s">The number of men trying has never been higher. So why is the number actually getting there going the wrong direction?</div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Male obesity rate — United States &nbsp;·&nbsp; CDC / NHANES</div>
+        <canvas id="chart" style="height:100px;max-height:100px"></canvas>
+        <div class="chart-src">CDC National Health and Nutrition Examination Survey</div>
+      </div>
+    </div>
+
+    <!-- 2 REAL PROBLEM -->
+    <div class="slide" id="s1">
+      <div class="lbl">The actual reason</div>
+      <h2>Most men do not fail at fitness.<br>The plan fails them.</h2>
+      <div class="flow">
+        <div class="fl">Every program most men have tried was built for someone with a completely different life. Stable schedule. Free evenings. No real pressure on their time.</div>
+        <div class="fl">That is not the life of a man with a career, real obligations, and a week that never looks the same twice.</div>
+        <div class="fl s">When the program does not fit your life, it will fail every time. Not because of anything you did wrong.</div>
+        <div class="fl q">The structure was always the problem. Never the effort.</div>
+      </div>
+    </div>
+
+    <!-- 3 RESTART CYCLE -->
+    <div class="slide" id="s2">
+      <div class="lbl">The cycle most men live in for years</div>
+      <h2>Start. Life happens. Stop. Restart.<br>And blame yourself for it.</h2>
+      <ul class="b">
+        <li><span class="dot dw">•</span>Week one goes well.</li>
+        <li><span class="dot dw">•</span>Week two or three — your actual week shows up.</li>
+        <li><span class="dot dw">•</span>Sessions get missed. Momentum is gone.</li>
+        <li><span class="dot dw">•</span>Instead of thinking "the plan failed reality" — most men think "I am just not consistent enough."</li>
+        <li><span class="dot db">•</span>That thought is the most expensive one in fitness. It sends you back to start over.</li>
+      </ul>
+    </div>
+
+    <!-- 4 BELIEFS -->
+    <div class="slide" id="s3">
+      <div class="lbl">The beliefs keeping men stuck</div>
+      <h2>Three things men tell themselves<br>that are quietly <u>holding them back.</u></h2>
+      <div class="beliefs">
+        <div class="belief"><b>"I just need to want it badly enough."</b>&nbsp; If the motivation is strong enough this time, the plan will stick.</div>
+        <div class="belief"><b>"I know what to do. I just need to actually do it."</b>&nbsp; The information is not the problem, the execution is.</div>
+        <div class="belief"><b>"Once things settle down, I will get serious."</b>&nbsp; There will be a point where life is calmer and this becomes easier.</div>
+      </div>
+      <div class="aside">None of those are character flaws. They are what happens when every plan you have been given required a life you do not have.</div>
+    </div>
+
+    <!-- 5 COST -->
+    <div class="slide" id="s4">
+      <div class="lbl">What this is actually costing you</div>
+      <h2>It does not just cost you the gym.</h2>
+      <ul class="b">
+        <li><span class="dot db">•</span>Energy throughout the day</li>
+        <li><span class="dot db">•</span>How you show up in rooms that matter</li>
+        <li><span class="dot db">•</span>The presence you bring home after work</li>
+        <li><span class="dot db">•</span>Confidence where you should not be second-guessing yourself</li>
+        <li><span class="dot db">•</span>Mental sharpness and how you handle pressure</li>
+        <li><span class="dot db">•</span>The photos you avoid and the moments you are not fully in</li>
+        <li><span class="dot db">•</span>The quiet background noise running in your head every day</li>
+        <li><span class="dot dw">•</span>And over time — the belief that this is just who you are now</li>
+      </ul>
+    </div>
+
+    <!-- 6 ANDREAS -->
+    <div class="slide" id="s5">
+      <div class="lbl">A real person. A real story.</div>
+      <h2>Andreas. Lost 26 lbs.<br>Had been trying for years.</h2>
+      <div class="stats">
+        <div class="st"><div class="sn">46+</div><div class="sl">hours a week, full time</div></div>
+        <div class="st"><div class="sn">26 lbs</div><div class="sl">lost with the right plan</div></div>
+        <div class="st"><div class="sn">Years</div><div class="sl">of programs that didn't fit</div></div>
+      </div>
+      <div class="flow">
+        <div class="fl">Andreas tried multiple programs. None lasted — none were built around the life he was actually living.</div>
+        <div class="fl">When the plan finally matched his real week — not an ideal one — he didn't miss a beat for three months.</div>
+        <div class="fl s">The work was always there. The right structure was not.</div>
+      </div>
+    </div>
+
+    <!-- 7 BEFORE / AFTER -->
+    <div class="slide" id="s6">
+      <div class="lbl">Andreas — the result</div>
+      <h2>Full time. 46+ hrs a week.<br>This is what fitting the plan to the person looks like.</h2>
+      <div class="photos">
+        <div class="photo-wrap">
+          <div class="photo-frame" id="sq-before" onclick="document.getElementById('inp-before').click()">
+            <input id="inp-before" type="file" accept="image/*" style="display:none" onchange="loadPhoto(this,'sq-before')">
+            <div class="photo-icon">+</div>
+            <div class="photo-txt">tap to add</div>
+          </div>
+          <div class="photo-label">BEFORE</div>
+        </div>
+        <div class="photo-wrap">
+          <div class="photo-frame" id="sq-after" onclick="document.getElementById('inp-after').click()">
+            <input id="inp-after" type="file" accept="image/*" style="display:none" onchange="loadPhoto(this,'sq-after')">
+            <div class="photo-icon">+</div>
+            <div class="photo-txt">tap to add</div>
+          </div>
+          <div class="photo-label">AFTER</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 STANDARDS -->
+    <div class="slide" id="s7">
+      <div class="lbl">Why the standard keeps failing men</div>
+      <h2>The programs men are given were not designed for their real life.</h2>
+      <ul class="b">
+        <li><span class="dot dw">•</span>Six days a week assumes you have six free days. Most men do not.</li>
+        <li><span class="dot dw">•</span>Two-hour sessions assume your evenings belong to you. They rarely do.</li>
+        <li><span class="dot dw">•</span>The standard demands perfect weeks from men whose weeks are never perfect.</li>
+        <li><span class="dot db">•</span>Men are told the answer is more discipline. The actual answer is a better structure.</li>
+      </ul>
+      <div class="flow" style="margin-top:8px">
+        <div class="fl q">When the structure does not fit the life, the man gets blamed. That is the standard. And it is wrong.</div>
+      </div>
+    </div>
+
+    <!-- 9 THE SHIFT -->
+    <div class="slide" id="s8">
+      <div class="lbl">The shift that actually changes things</div>
+      <h1 style="font-size:19px;color:#fff">You do not need more discipline.<br>You need a plan built around your <u>actual life.</u></h1>
+      <ul class="b">
+        <li><span class="dot db">•</span>Build around your real week. Not the ideal version of it.</li>
+        <li><span class="dot db">•</span>Measure how it holds up on your worst week. Not your best.</li>
+        <li><span class="dot db">•</span>A plan that survives a bad month is worth ten that only work when everything is perfect.</li>
+        <li><span class="dot dw">•</span>The men who fix this do not find more time. They stop using plans that need more than they have.</li>
+      </ul>
+    </div>
+
+    <!-- 10 CTA -->
+    <div class="slide" id="s9">
+      <div class="lbl">That's it</div>
+      <div class="cta-wrap">
+        <p>
+          If any of this described where you are right now —<br><br>
+          <strong>DM me "REBUILD" on Instagram.</strong><br><br>
+          No pitch. No call. Just an honest conversation about what's actually been keeping it from working.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /slides -->
+
+  <!-- NAV -->
+  <div class="nav">
+    <button id="bk" onclick="go(-1)" disabled>← BACK</button>
+    <span class="ctr" id="ct">1 of 10</span>
+    <button id="nx" onclick="go(1)">NEXT →</button>
+  </div>
+
+</div><!-- /stage -->
+
+<script>
+const n=10; let c=0;
+const all=[...document.querySelectorAll('.slide')];
+
+function dots(){
+  const pb=document.getElementById('prog');
+  pb.innerHTML='';
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='p';d.id='p'+i;pb.appendChild(d);
+  }
+}
+
+function render(){
+  all.forEach((s,i)=>{
+    s.classList.remove('on');
+    const d=document.getElementById('p'+i);
+    if(d)d.className='p'+(i<c?' done':i===c?' now':'');
+  });
+  all[c].classList.add('on');
+  document.getElementById('ct').textContent=(c+1)+' of '+n;
+  document.getElementById('bk').disabled=c===0;
+  const nx=document.getElementById('nx');
+  nx.disabled=c===n-1;
+  nx.textContent=c===n-1?'DONE':'NEXT →';
+}
+
+function go(d){c=Math.max(0,Math.min(n-1,c+d));render();}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+});
+
+// Touch swipe
+let tx=0;
+document.querySelector('.slides').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.querySelector('.slides').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>40) go(dx<0?1:-1);
+},{passive:true});
+
+function loadPhoto(input,frameId){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const frame=document.getElementById(frameId);
+    let img=frame.querySelector('img');
+    if(!img){img=document.createElement('img');frame.appendChild(img);}
+    img.src=e.target.result;
+    frame.querySelectorAll('.photo-icon,.photo-txt').forEach(el=>el.style.display='none');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Chart
+window.addEventListener('load',()=>{
+  const ctx=document.getElementById('chart');
+  if(!ctx||typeof Chart==='undefined')return;
+  new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['2000','2004','2008','2012','2016','2020','2023'],
+      datasets:[{
+        data:[27.5,30.2,32.2,33.8,37.9,41.9,39.3],
+        borderColor:'#4a7fcb',
+        backgroundColor:'rgba(74,127,203,0.1)',
+        borderWidth:2,
+        pointBackgroundColor:'#4a7fcb',
+        pointBorderColor:'#0c1e38',
+        pointBorderWidth:2,
+        pointRadius:4,fill:true,tension:0.35
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false},tooltip:{
+        backgroundColor:'rgba(10,20,40,0.9)',
+        titleColor:'rgba(255,255,255,0.5)',
+        bodyColor:'#fff',borderColor:'rgba(74,127,203,0.3)',borderWidth:1,
+        callbacks:{label:c=>`${c.parsed.y}% obesity rate`}
+      }},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'rgba(255,255,255,0.28)',font:{size:9}}},
+        y:{min:20,max:48,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'rgba(255,255,255,0.28)',font:{size:9},callback:v=>v+'%'}}
+      }
+    }
+  });
+});
+
+dots();render();
+
+// ── PINCH TO SHRINK STAGE ONLY ──────────────────────────
+(function(){
+  const stage = document.querySelector('.stage');
+  let scale = 1, lastScale = 1;
+  let startDist = 0;
+
+  function dist(t){
+    const dx = t[0].clientX - t[1].clientX;
+    const dy = t[0].clientY - t[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  // Check if we're in forced-landscape (portrait phone)
+  function isPortrait(){ return window.innerHeight > window.innerWidth; }
+
+  function applyScale(s){
+    scale = s;
+    // In portrait mode the stage is already rotated 90deg by CSS,
+    // so we compose the scale on top of that rotation
+    if(isPortrait()){
+      stage.style.transform = `rotate(90deg) scale(${scale})`;
+    } else {
+      stage.style.transform = `scale(${scale})`;
+    }
+    stage.style.transformOrigin = 'center center';
+  }
+
+  stage.addEventListener('touchstart', e => {
+    if(e.touches.length === 2){
+      e.preventDefault();
+      startDist = dist(e.touches);
+      lastScale = scale;
+    }
+  }, {passive:false});
+
+  stage.addEventListener('touchmove', e => {
+    if(e.touches.length === 2){
+      e.preventDefault();
+      const d = dist(e.touches);
+      const s = Math.min(1.0, Math.max(0.35, lastScale * (d / startDist)));
+      applyScale(s);
+    }
+  }, {passive:false});
+
+  // Double-tap to reset to full size
+  let lastTap = 0;
+  stage.addEventListener('touchend', e => {
+    if(e.touches.length > 0) return;
+    const now = Date.now();
+    if(now - lastTap < 300){ applyScale(1); }
+    lastTap = now;
+  }, {passive:true});
+
+  // Re-apply correct transform on orientation change
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => applyScale(scale), 100);
+  });
+})();
+</script>
+</body>
+</html>
