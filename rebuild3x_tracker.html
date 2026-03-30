@@ -483,9 +483,9 @@ textarea.mfi{resize:vertical;min-height:66px;line-height:1.6}
       <div class="btn-row" id="co-btns"></div>
     </div>
     <div class="det-tabs" id="det-tabs" style="display:none">
-      <button class="det-tab on" data-tab="overview">Overview</button>
+      <button class="det-tab on" data-tab="checkins">Check-Ins</button>
+      <button class="det-tab" data-tab="overview">Stats & Analysis</button>
       <button class="det-tab" data-tab="photos">Photos</button>
-      <button class="det-tab" data-tab="history">History</button>
     </div>
   </div>
   <div class="coach-wrap">
@@ -523,7 +523,7 @@ textarea.mfi{resize:vertical;min-height:66px;line-height:1.6}
 var PW='1290', SK='r3x_v8';
 var SURL='https://rjvrpxphymjnyzpxbfhf.supabase.co';
 var SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqdnJweHBoeW1qbnl6cHhiZmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNjA4MjMsImV4cCI6MjA4OTgzNjgyM30.p-p9BCeVg7Ll1lTHg2J7wn--FfpQRk2lZ9-hynkATvI';
-var unlocked=false, detId=null, detTab='overview';
+var unlocked=false, detId=null, detTab='checkins';
 var rv={overall:null,nutrition:null};
 var tv={feeling:'great',sleep:'5to6',steps:'some'};
 var ph={f:null,s:null,b:null};
@@ -1207,12 +1207,12 @@ function renderDash(){
 
 // ── DETAIL ────────────────────────────────────────────
 function openDet(id){
-  detId=id;detTab='overview';
+  detId=id;detTab='checkins';
   document.getElementById('co-list').style.display='none';
   document.getElementById('co-det').style.display='block';
   var tabs=document.getElementById('det-tabs');
   tabs.style.display='flex';
-  tabs.querySelectorAll('.det-tab').forEach(function(t){t.classList.toggle('on',t.dataset.tab==='overview')});
+  tabs.querySelectorAll('.det-tab').forEach(function(t){t.classList.toggle('on',t.dataset.tab==='checkins')});
   var clients=_clients;
   var c=clients.find(function(x){return x.id===id});
   if(c)document.getElementById('co-title').textContent=c.name;
@@ -1223,7 +1223,7 @@ function openDet(id){
   var det=document.getElementById('co-det');
   det.style.opacity='0';
   requestAnimationFrame(function(){
-    renderTab(id,'overview');
+    renderTab(id,'checkins');
     det.style.transition='opacity .18s ease';
     det.style.opacity='1';
   });
@@ -1257,9 +1257,9 @@ function renderTab(id,tab){
   var maxWk=Math.max(0,weeks.reduce(function(a,w){return Math.max(a,w.week)},0),photos.reduce(function(a,p){return Math.max(a,p.week)},0));
   var det=document.getElementById('co-det');
   det.innerHTML='';
-  if(tab==='overview')buildOverview(c,weeks,photos,sw,goalW,lw,maxWk,det);
+  if(tab==='checkins')buildCheckins(c,weeks,sw,det);
+  else if(tab==='overview')buildOverview(c,weeks,photos,sw,goalW,lw,maxWk,det);
   else if(tab==='photos')buildPhotos(c,weeks,photos,maxWk,det);
-  else if(tab==='history')buildHistory(c,weeks,sw,det);
 }
 
 // ── OVERVIEW ──────────────────────────────────────────
@@ -1364,6 +1364,251 @@ function buildPhotos(c,weeks,photos,maxWk,container){
 }
 
 // ── HISTORY TAB ───────────────────────────────────────
+function buildCheckins(c,weeks,sw,container){
+  if(!weeks.length){
+    container.innerHTML='<div class="empty"><p>No check-ins yet.<br>When '+xe(c.name.split(' ')[0])+' submits the form it appears here.</p></div>';
+    return;
+  }
+
+  var fMap={great:'Felt great',okay:'Up and down',tired:'Tired',stressed:'Stressed',drained:'Drained'};
+  var sMap={under5:'Under 5 hours','5to6':'5 to 6 hours','6to7':'6 to 7 hours','7to8':'7 to 8 hours',over8:'Over 8 hours'};
+  var stMap={yes:'Yes, most days','some':'Some days','no':'No'};
+
+  // Call prep at the top — built locally from latest week data
+  var last=weeks[weeks.length-1];
+  var prev=weeks.length>1?weeks[weeks.length-2]:null;
+  var callPrep=buildCallPrep(c,weeks,last,prev,sw);
+  container.appendChild(callPrep);
+
+  // Weeks: latest first
+  var sorted=weeks.slice().reverse();
+  sorted.forEach(function(w,ri){
+    var i=weeks.length-1-ri;
+    var prevW=i===0?sw:parseFloat(weeks[i-1].weight);
+    var d=(parseFloat(w.weight)-prevW).toFixed(1);
+    var isLatest=(ri===0);
+    var dc=parseFloat(d)<0?'dd':parseFloat(d)>0?'du':'df';
+    var badge=parseFloat(d)<0?d+'kg':parseFloat(d)>0?'+'+d+'kg':'same';
+    var nc=w.nutrition_r>=8?'var(--green)':w.nutrition_r>=5?'var(--amber)':'var(--red)';
+    var sc=(w.sleep==='7to8'||w.sleep==='over8')?'var(--green)':w.sleep==='under5'?'var(--red)':'var(--amber)';
+
+    // Card wrapper
+    var card=document.createElement('div');
+    card.style.cssText='background:var(--bg2);border:1px solid '+(isLatest?'var(--blue)':'var(--bd)')+';border-radius:12px;margin-bottom:10px;overflow:hidden';
+
+    // ── HEADER (always visible) ──
+    var hdr=document.createElement('div');
+    hdr.style.cssText='display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer;user-select:none';
+
+    // Week pill
+    var wpill=document.createElement('div');
+    wpill.style.cssText='font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;letter-spacing:1.5px;padding:4px 10px;border-radius:5px;flex-shrink:0;'+(isLatest?'background:var(--blue);color:var(--w)':'background:var(--bg3);color:var(--bl)');
+    wpill.textContent='Week '+w.week;
+
+    // Weight + diff
+    var wtxt=document.createElement('div');
+    wtxt.style.cssText='flex:1;min-width:0';
+    wtxt.innerHTML='<span style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:800;color:var(--w)">'+w.weight+'kg</span>'
+      +'<span class="diff '+dc+'" style="margin-left:8px">'+badge+'</span>'
+      +'<div style="font-size:11px;color:var(--w50);margin-top:2px">'+xe(w.date||'')+'</div>';
+
+    // Score pills
+    var scores=document.createElement('div');
+    scores.style.cssText='display:flex;gap:5px;flex-shrink:0';
+    if(w.overall!=null){
+      var s1=document.createElement('span');
+      s1.style.cssText='font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;background:var(--bg3);color:var(--w80)';
+      s1.textContent=w.overall+'/10';
+      scores.appendChild(s1);
+    }
+    if(w.nutrition_r!=null){
+      var s2=document.createElement('span');
+      s2.style.cssText='font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;background:var(--bg3);color:'+nc;
+      s2.textContent='Nut '+w.nutrition_r+'/10';
+      scores.appendChild(s2);
+    }
+
+    // Chevron
+    var chev=document.createElement('span');
+    chev.style.cssText='color:var(--w50);font-size:16px;flex-shrink:0;transition:transform .2s;display:inline-block;'+(isLatest?'transform:rotate(180deg)':'');
+    chev.textContent='⌄';
+
+    hdr.appendChild(wpill);
+    hdr.appendChild(wtxt);
+    hdr.appendChild(scores);
+    hdr.appendChild(chev);
+    card.appendChild(hdr);
+
+    // ── BODY (Q&A) ──
+    var body=document.createElement('div');
+    body.style.cssText='border-top:1px solid var(--bd);padding:16px 15px;'+(isLatest?'':'display:none');
+
+    // Full Q&A — every question with exact answer
+    var qas=[
+      {q:'Weight this morning',a:w.weight?w.weight+' kg':null,highlight:true},
+      {q:'How did this week feel overall?',a:w.overall!=null?w.overall+' out of 10':null},
+      {q:'How did your training go this week?',a:w.training||null},
+      {q:'How did you feel this week?',a:w.feeling?(fMap[w.feeling]||w.feeling):null},
+      {q:'How was your nutrition and protein this week?',a:w.nutrition||null},
+      {q:'Nutrition consistency',a:w.nutrition_r!=null?w.nutrition_r+' out of 10':null},
+      {q:'Average sleep per night',a:w.sleep?(sMap[w.sleep]||w.sleep):null,color:sc},
+      {q:'Did you hit your step goal?',a:w.steps?(stMap[w.steps]||w.steps):null},
+      {q:'Biggest challenge with the program',a:w.challenge||null,highlight2:true},
+      {q:'One win from this week',a:w.win||null,win:true},
+      {q:'Anything else',a:w.notes||null},
+    ];
+
+    qas.forEach(function(qa){
+      if(!qa.a)return;
+      var row=document.createElement('div');
+      row.style.cssText='margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.05)';
+      var ql=document.createElement('div');
+      ql.style.cssText='font-size:9px;color:var(--w50);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:5px';
+      ql.textContent=qa.q;
+      var qv=document.createElement('div');
+      var ansColor=qa.win?'var(--green)':qa.color||'var(--w80)';
+      qv.style.cssText='font-size:14px;color:'+ansColor+';font-weight:'+(qa.highlight||qa.win?'500':'300')+';line-height:1.65';
+      qv.textContent=qa.a;
+      row.appendChild(ql);
+      row.appendChild(qv);
+      body.appendChild(row);
+    });
+
+    // Adjustment box
+    var adjBox=document.createElement('div');
+    adjBox.style.cssText='background:var(--bdim);border:1px solid var(--blue);border-radius:8px;padding:12px 13px;margin-top:6px';
+    var adjL=document.createElement('div');
+    adjL.style.cssText='font-size:9px;color:var(--bl);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px';
+    adjL.textContent='Your Adjustment for Next Week';
+    var adjTa=document.createElement('textarea');
+    adjTa.className='adj-ta';
+    adjTa.id='adj-'+c.id+'-'+w.week;
+    adjTa.placeholder='Write your specific focus for next week...';
+    adjTa.value=w.adjustment||'';
+    var adjSave=document.createElement('button');
+    adjSave.className='adj-s';
+    adjSave.id='adjs-'+c.id+'-'+w.week;
+    adjSave.textContent='Save';
+    adjBox.appendChild(adjL);
+    adjBox.appendChild(adjTa);
+    adjBox.appendChild(adjSave);
+    body.appendChild(adjBox);
+    card.appendChild(body);
+
+    // Toggle
+    hdr.addEventListener('click',function(){
+      var open=body.style.display!=='none';
+      body.style.display=open?'none':'block';
+      chev.style.transform=open?'':'rotate(180deg)';
+    });
+    (function(cid,wk){
+      adjSave.addEventListener('click',function(e){e.stopPropagation();saveAdj(cid,wk)});
+    })(c.id,w.week);
+
+    container.appendChild(card);
+  });
+}
+
+// ── CALL PREP (local, no API, in Kyriakos's voice) ───
+function buildCallPrep(c,weeks,last,prev,sw){
+  var fname=c.name.split(' ')[0];
+  var box=document.createElement('div');
+  box.style.cssText='background:var(--bdim);border:1px solid var(--blue);border-radius:12px;padding:16px;margin-bottom:14px';
+
+  var title=document.createElement('div');
+  title.style.cssText='font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--bl);margin-bottom:12px';
+  title.textContent='Call Prep — Week '+last.week;
+  box.appendChild(title);
+
+  var points=[];
+
+  // Weight movement
+  var lw=parseFloat(last.weight);
+  var pw=prev?parseFloat(prev.weight):parseFloat(sw);
+  var diff=(lw-pw).toFixed(1);
+  if(parseFloat(diff)<=-0.5) points.push({t:'Weight',v:'Down '+Math.abs(diff)+'kg this week — open with this. Tell him you saw it and it is working. Do not move on until he hears it.',c:'var(--green)'});
+  else if(parseFloat(diff)>0.6) points.push({t:'Weight',v:'Up '+diff+'kg — before saying anything, ask: "Was there a heavy meal or less water this week?" Do not change the plan until you hear the answer.',c:'var(--amber)'});
+  else if(Math.abs(parseFloat(diff))<=0.2) points.push({t:'Weight',v:'Flat this week at '+lw+'kg — tell him one flat week means nothing, the trend is what matters.',c:'var(--amber)'});
+
+  // Nutrition
+  var nr=last.nutrition_r;
+  if(nr!=null){
+    if(nr<=4) points.push({t:'Nutrition',v:'Scored '+nr+'/10 — do not give advice yet. Ask: "What did the worst day look like?" Let him answer fully first.',c:'var(--red)'});
+    else if(nr<=6) points.push({t:'Nutrition',v:'Scored '+nr+'/10 — ask which days fell apart. Then give him one fix for that specific day only.',c:'var(--amber)'});
+    else if(nr>=8) points.push({t:'Nutrition',v:'Scored '+nr+'/10 — acknowledge it. Tell him this is what moves the scale.',c:'var(--green)'});
+  }
+
+  // Nutrition text — pull patterns
+  var nt=(last.nutrition||'').toLowerCase();
+  if(nt.includes('evening')||nt.includes('night')||nt.includes('overat')) points.push({t:'Evening eating',v:'He mentioned evening eating again. One rule to give: after 7pm protein and veg only, no carbs. That is it.',c:'var(--amber)'});
+  if(nt.includes('weekend')) points.push({t:'Weekend',v:'Weekends keep breaking down. Ask: "What does Saturday morning look like for you?" The answer tells you where to fix it.',c:'var(--amber)'});
+  if(nt.includes('restaurant')||nt.includes('eating out')||nt.includes('eat out')) points.push({t:'Eating out',v:'He ate out this week. Remind him: keep breakfast and lunch lighter on days he knows he is eating out. The evening then fits.',c:'var(--amber)'});
+
+  // Training
+  var tr=(last.training||'').toLowerCase();
+  var missed=tr.includes('miss')||tr.includes('skip')||tr.includes('did not')||tr.includes('didn')||tr.includes('couldn')||tr.includes('zero')||tr.includes('none');
+  var hitAll=tr.includes('all three')||tr.includes('all session')||tr.includes('every session');
+  if(hitAll) points.push({t:'Training',v:'All sessions done — tell him this is the standard and you noticed.',c:'var(--green)'});
+  else if(missed) points.push({t:'Training',v:'Session missed — ask: "What specifically stopped that one?" One barrier removed fixes the pattern.',c:'var(--red)'});
+
+  // Sleep
+  if(last.sleep==='under5'||last.sleep==='5to6') points.push({t:'Sleep',v:'Sleep is low ('+(last.sleep==='under5'?'under 5h':'5-6h')+') — ask what time he is actually going to sleep. Work backward from wake time. Phone away 30 min before bed is the only ask.',c:'var(--red)'});
+
+  // Challenge — direct callout
+  var ch=(last.challenge||'').trim();
+  if(ch.length>5) points.push({t:'His challenge this week',v:'"'+ch+'" — address this directly. This is what he came to the call to talk about.',c:'var(--w80)'});
+
+  // Win — acknowledge
+  var win=(last.win||'').trim();
+  if(win.length>3) points.push({t:'His win',v:'"'+win+'" — start the call by acknowledging this before anything else.',c:'var(--green)'});
+
+  // One focus for next week
+  var focus='';
+  if(nr!=null&&nr<=5) focus='One focus next week: protein at every single meal. Not the plate rule, not calories — just protein first, every meal, every day.';
+  else if(last.sleep==='under5'||last.sleep==='5to6') focus='One focus next week: consistent bedtime. Set it tonight. Same time every night. That is the only ask.';
+  else if(missed) focus='One focus next week: the specific session that keeps getting missed. Lock the time for it right now on the call before he hangs up.';
+  else if(nr!=null&&nr>=8&&hitAll) focus='Everything is working. One focus: do not change anything. Let it compound for one more week.';
+  else focus='One focus next week: the plate rule at every meal, every day, without exception.';
+
+  // Build the UI
+  if(win.length>3){
+    var winEl=document.createElement('div');
+    winEl.style.cssText='background:rgba(34,197,94,.08);border-left:2px solid var(--green);border-radius:0 6px 6px 0;padding:9px 12px;margin-bottom:10px';
+    winEl.innerHTML='<div style="font-size:9px;color:var(--green);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">Start here — his win</div>'
+      +'<div style="font-size:13px;color:var(--w80);font-weight:300;line-height:1.6">"'+xe(win)+'"</div>';
+    box.appendChild(winEl);
+  }
+
+  points.forEach(function(p){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)';
+    var dot=document.createElement('div');
+    dot.style.cssText='width:6px;height:6px;border-radius:50%;background:'+p.c+';margin-top:6px;flex-shrink:0';
+    var txt=document.createElement('div');
+    txt.style.cssText='flex:1';
+    txt.innerHTML='<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:'+p.c+'">'+p.t+'</span>'
+      +'<div style="font-size:13px;color:var(--w80);font-weight:300;line-height:1.65;margin-top:3px">'+xe(p.v)+'</div>';
+    row.appendChild(dot);
+    row.appendChild(txt);
+    box.appendChild(row);
+  });
+
+  // Focus for next week
+  var focusEl=document.createElement('div');
+  focusEl.style.cssText='background:rgba(26,82,224,.1);border-left:2px solid var(--blue);border-radius:0 6px 6px 0;padding:9px 12px;margin-top:10px';
+  focusEl.innerHTML='<div style="font-size:9px;color:var(--bl);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">One Focus for Next Week</div>'
+    +'<div style="font-size:13px;color:var(--w80);font-weight:300;line-height:1.6">'+xe(focus)+'</div>';
+  box.appendChild(focusEl);
+
+  return box;
+}
+
+function buildHistory(c,weeks,sw,container){
+  // History tab now just calls buildCheckins for backwards compat
+  buildCheckins(c,weeks,sw,container);
+}
+
+
 function buildHistory(c,weeks,sw,container){
   if(!weeks.length){container.innerHTML='<div class="empty"><p>No check-ins yet.</p></div>';return}
 
